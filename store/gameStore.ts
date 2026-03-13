@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Player, GamePhase, Round, RoundResult, VoteResult, Role } from '@/types/game';
+import { Player, GamePhase, Round, RoundResult, Role } from '@/types/game';
 import { getRandomWord } from '@/data/categories';
 import { generateId, shuffleArray } from '@/utils/helpers';
 
@@ -21,18 +21,7 @@ interface GameStore {
   markPlayerRevealed: (playerId: string) => void;
   allPlayersRevealed: () => boolean;
 
-  // Hints
-  markHintGiven: (playerId: string) => void;
-  allHintsGiven: () => boolean;
-
-  // Voting
-  castVote: (voterId: string, targetId: string) => void;
-  allVotesCast: () => boolean;
-  getVoteResults: () => VoteResult[];
-  getMostVotedPlayerId: () => { playerId: string | null; isTie: boolean };
-
   // Results
-  calculateResults: () => void;
   imposterFinalGuess: (word: string) => boolean;
 
   // Game flow
@@ -127,95 +116,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   allPlayersRevealed: () => {
     return get().players.every((p) => p.hasRevealed);
-  },
-
-  markHintGiven: (playerId) => {
-    set((state) => ({
-      players: state.players.map((p) =>
-        p.id === playerId ? { ...p, hasGivenHint: true } : p
-      ),
-    }));
-  },
-
-  allHintsGiven: () => {
-    return get().players.every((p) => p.hasGivenHint);
-  },
-
-  castVote: (voterId, targetId) => {
-    set((state) => ({
-      players: state.players.map((p) =>
-        p.id === voterId ? { ...p, hasVoted: true, voteTargetId: targetId } : p
-      ),
-    }));
-  },
-
-  allVotesCast: () => {
-    return get().players.every((p) => p.hasVoted);
-  },
-
-  getVoteResults: () => {
-    const { players } = get();
-    const voteCounts: Record<string, number> = {};
-
-    players.forEach((p) => {
-      if (p.voteTargetId) {
-        voteCounts[p.voteTargetId] = (voteCounts[p.voteTargetId] || 0) + 1;
-      }
-    });
-
-    return players.map((p) => ({
-      playerId: p.id,
-      playerName: p.name,
-      voteCount: voteCounts[p.id] || 0,
-    })).sort((a, b) => b.voteCount - a.voteCount);
-  },
-
-  // Bug #3 fix: detect ties
-  getMostVotedPlayerId: () => {
-    const results = get().getVoteResults();
-    if (results.length === 0) return { playerId: null, isTie: false };
-
-    const topVotes = results[0].voteCount;
-    if (topVotes === 0) return { playerId: null, isTie: false };
-
-    const topPlayers = results.filter((r) => r.voteCount === topVotes);
-    if (topPlayers.length > 1) {
-      return { playerId: null, isTie: true };
-    }
-    return { playerId: results[0].playerId, isTie: false };
-  },
-
-  // Bug #5 fix: calculateResults no longer returns a value, always updates state
-  calculateResults: () => {
-    const { round, players } = get();
-    if (!round) return;
-
-    const { playerId: mostVotedId, isTie } = get().getMostVotedPlayerId();
-
-    let result: RoundResult;
-    if (isTie || !mostVotedId) {
-      // Tie: no one eliminated, imposter wins
-      result = 'imposter_wins';
-    } else {
-      const isImposter = round.imposterIds.includes(mostVotedId);
-      result = isImposter ? 'civilians_win' : 'imposter_wins';
-    }
-
-    // Update scores
-    const updatedPlayers = players.map((p) => {
-      if (result === 'civilians_win' && p.role === 'civilian') {
-        return { ...p, score: p.score + 1 };
-      }
-      if (result === 'imposter_wins' && p.role === 'imposter') {
-        return { ...p, score: p.score + 2 };
-      }
-      return p;
-    });
-
-    set({
-      players: updatedPlayers,
-      round: { ...round, roundResult: result, phase: 'results' },
-    });
   },
 
   // Bug #8 fix: revoke civilian points when imposter guesses correctly

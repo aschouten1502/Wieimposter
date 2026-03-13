@@ -5,14 +5,10 @@ export type GamePhase =
   | 'passing'
   | 'reveal'
   | 'hints'
-  | 'discussion'
   | 'voting'
-  | 'vote-passing'
   | 'results';
 
 export type RoundResult = 'civilians_win' | 'imposter_wins' | 'imposter_guessed';
-
-export type VotingMode = 'open' | 'secret';
 
 export interface Player {
   id: string;
@@ -37,17 +33,6 @@ export interface Word {
   id: string;
   value: string;
   difficulty: 'easy' | 'medium' | 'hard';
-}
-
-export interface GameSettings {
-  playerCount: number;
-  impostersCount: number;
-  votingMode: VotingMode;
-  discussionTimer: number;
-  hintTimer: number;
-  timerEnabled: boolean;
-  soundEnabled: boolean;
-  hapticsEnabled: boolean;
 }
 
 export interface Round {

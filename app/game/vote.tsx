@@ -7,7 +7,6 @@ import { PlayerBadge } from '@/components/PlayerBadge';
 import { Colors, Spacing, FontSize } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
-import { PLAYER_COLORS } from '@/constants/config';
 
 export default function VoteScreen() {
   const router = useRouter();
@@ -16,71 +15,71 @@ export default function VoteScreen() {
 
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
-  const castVote = useGameStore((s) => s.castVote);
-  const nextPlayer = useGameStore((s) => s.nextPlayer);
   const setPhase = useGameStore((s) => s.setPhase);
-  const calculateResults = useGameStore((s) => s.calculateResults);
 
   if (!round) {
     router.replace('/');
     return null;
   }
 
-  const currentPlayer = players[round.currentPlayerIndex];
-  if (!currentPlayer) {
-    router.replace('/');
-    return null;
-  }
-
-  const isLastVoter = round.currentPlayerIndex >= players.length - 1;
-  const otherPlayers = players.filter((p) => p.id !== currentPlayer.id);
-  const color = PLAYER_COLORS[round.currentPlayerIndex % PLAYER_COLORS.length];
-
-  const handleVote = () => {
+  const handleConfirm = () => {
     if (!selectedId) return;
-    haptics.medium();
+    haptics.heavy();
 
-    castVote(currentPlayer.id, selectedId);
+    // Check if the selected player is the imposter
+    const isImposter = round.imposterIds.includes(selectedId);
+    const result = isImposter ? 'civilians_win' : 'imposter_wins';
 
-    if (isLastVoter) {
-      calculateResults();
-      router.replace('/game/results');
-    } else {
-      nextPlayer();
-      router.replace('/game/vote-pass');
-    }
+    // Update scores
+    const updatedPlayers = players.map((p) => {
+      if (result === 'civilians_win' && p.role === 'civilian') {
+        return { ...p, score: p.score + 1 };
+      }
+      if (result === 'imposter_wins' && p.role === 'imposter') {
+        return { ...p, score: p.score + 2 };
+      }
+      return p;
+    });
+
+    useGameStore.setState({
+      players: updatedPlayers,
+      round: { ...round, roundResult: result, phase: 'results' },
+    });
+
+    router.replace('/game/results');
   };
 
   return (
     <ScreenContainer>
       <View style={styles.header}>
         <Text style={styles.phase}>STEMMEN</Text>
-        <Text style={[styles.voterName, { color }]}>{currentPlayer.name}</Text>
-        <Text style={styles.instruction}>Op wie stem je?</Text>
+        <Text style={styles.emoji}>👆</Text>
+        <Text style={styles.title}>Wijs tegelijk aan!</Text>
+        <Text style={styles.subtitle}>
+          Tel op 3... 1, 2, 3 — WIJS!{'\n'}
+          Selecteer wie de meeste stemmen kreeg.
+        </Text>
       </View>
 
       <ScrollView style={styles.playerList} showsVerticalScrollIndicator={false}>
-        {otherPlayers.map((player) => {
-          const playerIndex = players.findIndex((p) => p.id === player.id);
-          return (
-            <PlayerBadge
-              key={player.id}
-              name={player.name}
-              index={playerIndex}
-              selected={selectedId === player.id}
-              onPress={() => {
-                haptics.light();
-                setSelectedId(player.id);
-              }}
-            />
-          );
-        })}
+        {players.map((player, index) => (
+          <PlayerBadge
+            key={player.id}
+            name={player.name}
+            index={index}
+            selected={selectedId === player.id}
+            onPress={() => {
+              haptics.light();
+              setSelectedId(player.id);
+            }}
+          />
+        ))}
       </ScrollView>
 
       <View style={styles.buttonContainer}>
         <Button
-          title="BEVESTIG STEM"
-          onPress={handleVote}
+          title="BEVESTIG"
+          onPress={handleConfirm}
           disabled={!selectedId}
           size="lg"
         />
@@ -102,15 +101,21 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
     marginBottom: Spacing.sm,
   },
-  voterName: {
-    fontSize: FontSize.xxxl,
-    fontWeight: '900',
-    letterSpacing: 2,
+  emoji: {
+    fontSize: 48,
+    marginBottom: Spacing.sm,
   },
-  instruction: {
+  title: {
+    color: Colors.text,
+    fontSize: FontSize.xxl,
+    fontWeight: '800',
+  },
+  subtitle: {
     color: Colors.textSecondary,
-    fontSize: FontSize.lg,
+    fontSize: FontSize.md,
+    textAlign: 'center',
     marginTop: Spacing.sm,
+    lineHeight: 22,
   },
   playerList: {
     flex: 1,

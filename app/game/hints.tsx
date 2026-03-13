@@ -1,100 +1,56 @@
-import React, { useRef, useCallback } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
-import { TimerDisplay } from '@/components/Timer';
+import { PlayerBadge } from '@/components/PlayerBadge';
 import { Colors, Spacing, FontSize } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
-import { useSettingsStore } from '@/store/settingsStore';
-import { useTimer } from '@/hooks/useTimer';
-import { useHaptics } from '@/hooks/useHaptics';
-import { PLAYER_COLORS } from '@/constants/config';
 
 export default function HintsScreen() {
   const router = useRouter();
-  const haptics = useHaptics();
-  const isAdvancing = useRef(false);
-
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
-  const markHintGiven = useGameStore((s) => s.markHintGiven);
-  const nextPlayer = useGameStore((s) => s.nextPlayer);
   const setPhase = useGameStore((s) => s.setPhase);
 
-  const timerEnabled = useSettingsStore((s) => s.timerEnabled);
-  const hintTimer = useSettingsStore((s) => s.hintTimer);
-
-  const currentPlayerIndex = round?.currentPlayerIndex ?? 0;
-  const currentPlayer = players[currentPlayerIndex] ?? null;
-  const isLastPlayer = currentPlayerIndex >= players.length - 1;
-
-  const handleNext = useCallback(() => {
-    // Guard against timer + button race condition
-    if (isAdvancing.current) return;
-    if (!currentPlayer) return;
-    isAdvancing.current = true;
-
-    haptics.light();
-    markHintGiven(currentPlayer.id);
-
-    if (isLastPlayer) {
-      setPhase('discussion');
-      router.replace('/game/discussion');
-    } else {
-      nextPlayer();
-      restart();
-    }
-
-    // Reset guard after state updates propagate
-    setTimeout(() => { isAdvancing.current = false; }, 100);
-  }, [currentPlayer, isLastPlayer, haptics, markHintGiven, nextPlayer, setPhase, router]);
-
-  const { seconds, progress, restart } = useTimer({
-    initialSeconds: hintTimer,
-    autoStart: timerEnabled && !!round,
-    onExpire: () => {
-      haptics.warning();
-      handleNext();
-    },
-  });
-
-  if (!round || !currentPlayer) {
+  if (!round) {
     router.replace('/');
     return null;
   }
 
-  const color = PLAYER_COLORS[currentPlayerIndex % PLAYER_COLORS.length];
+  const handleDone = () => {
+    setPhase('voting');
+    router.replace('/game/vote');
+  };
 
   return (
-    <ScreenContainer centered>
+    <ScreenContainer>
       <View style={styles.header}>
         <Text style={styles.phase}>HINT RONDE</Text>
-        {timerEnabled && <TimerDisplay seconds={seconds} progress={progress} />}
+        <Text style={styles.title}>Geef om de beurt 2 woorden!</Text>
+        <Text style={styles.subtitle}>
+          Begin bij de eerste speler en ga de kring rond.{'\n'}
+          Geef subtiele hints — niet te makkelijk!
+        </Text>
       </View>
 
-      <View style={styles.content}>
-        <Text style={styles.turnLabel}>Aan de beurt:</Text>
-        <Text style={[styles.playerName, { color }]}>{currentPlayer.name}</Text>
-        <Text style={styles.instruction}>Geef een hint met één woord</Text>
-      </View>
-
-      <View style={styles.progressDots}>
-        {players.map((p, i) => (
-          <View
-            key={p.id}
-            style={[
-              styles.dot,
-              { backgroundColor: PLAYER_COLORS[i % PLAYER_COLORS.length] },
-              i <= currentPlayerIndex && styles.dotActive,
-              i > currentPlayerIndex && styles.dotInactive,
-            ]}
+      <View style={styles.playerList}>
+        <Text style={styles.orderLabel}>Volgorde:</Text>
+        {players.map((player, index) => (
+          <PlayerBadge
+            key={player.id}
+            name={player.name}
+            index={index}
           />
         ))}
       </View>
 
       <View style={styles.buttonContainer}>
-        <Button title="VOLGENDE SPELER" onPress={handleNext} size="lg" />
+        <Button
+          title="KLAAR — GA STEMMEN"
+          onPress={handleDone}
+          size="lg"
+        />
       </View>
     </ScreenContainer>
   );
@@ -102,8 +58,8 @@ export default function HintsScreen() {
 
 const styles = StyleSheet.create({
   header: {
-    width: '100%',
-    gap: Spacing.sm,
+    alignItems: 'center',
+    marginTop: Spacing.lg,
     marginBottom: Spacing.xl,
   },
   phase: {
@@ -111,49 +67,33 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     fontWeight: '800',
     letterSpacing: 3,
+    marginBottom: Spacing.md,
+  },
+  title: {
+    color: Colors.text,
+    fontSize: FontSize.xxl,
+    fontWeight: '800',
     textAlign: 'center',
   },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  turnLabel: {
+  subtitle: {
     color: Colors.textSecondary,
-    fontSize: FontSize.lg,
-    fontWeight: '500',
-  },
-  playerName: {
-    fontSize: FontSize.display,
-    fontWeight: '900',
-    letterSpacing: 2,
-    marginVertical: Spacing.md,
-    textAlign: 'center',
-  },
-  instruction: {
-    color: Colors.textMuted,
     fontSize: FontSize.md,
-    fontStyle: 'italic',
+    textAlign: 'center',
+    marginTop: Spacing.sm,
+    lineHeight: 22,
   },
-  progressDots: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: Spacing.sm,
-    marginBottom: Spacing.xl,
+  playerList: {
+    flex: 1,
   },
-  dot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  dotActive: {
-    opacity: 1,
-  },
-  dotInactive: {
-    opacity: 0.3,
+  orderLabel: {
+    color: Colors.textMuted,
+    fontSize: FontSize.sm,
+    fontWeight: '700',
+    letterSpacing: 2,
+    marginBottom: Spacing.sm,
+    textTransform: 'uppercase',
   },
   buttonContainer: {
-    width: '100%',
     paddingBottom: Spacing.lg,
   },
 });

@@ -8,7 +8,7 @@ const RULES = [
   {
     emoji: '👥',
     title: 'Rollen verdelen',
-    description: 'Iedereen krijgt een rol: burger of imposter. De telefoon wordt doorgegeven zodat iedereen privé zijn rol ziet.',
+    description: 'Geef de telefoon door zodat iedereen privé zijn rol ziet. Burgers of imposter!',
   },
   {
     emoji: '🔤',
@@ -18,17 +18,12 @@ const RULES = [
   {
     emoji: '💡',
     title: 'Hints geven',
-    description: 'Geef om de beurt een hint met één woord. Wees subtiel genoeg zodat de imposter het niet raadt, maar duidelijk genoeg dat burgers je herkennen.',
+    description: 'Geef om de beurt 2 woorden als hint in de groep. Wees subtiel genoeg zodat de imposter het niet raadt!',
   },
   {
-    emoji: '🗣️',
-    title: 'Discussie',
-    description: 'Bespreek met de groep wie er verdacht is. Wie gaf een vage hint? Wie deed alsof?',
-  },
-  {
-    emoji: '🗳️',
-    title: 'Stemmen',
-    description: 'Iedereen stemt op wie zij denken dat de imposter is. De persoon met de meeste stemmen vliegt eruit!',
+    emoji: '👉',
+    title: 'Wijzen',
+    description: 'Tel tot 3 en wijs tegelijk naar wie jij denkt dat de imposter is. De persoon met de meeste stemmen vliegt eruit!',
   },
   {
     emoji: '🏆',

@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { Stepper } from '@/components/Stepper';
 import { PlayerInput } from '@/components/PlayerInput';
 import { CategoryCard } from '@/components/CategoryCard';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { Colors, Spacing, FontSize } from '@/constants/theme';
 import { MIN_PLAYERS, MAX_PLAYERS } from '@/constants/config';
 import { categories } from '@/data/categories';
 import { useGameStore } from '@/store/gameStore';
@@ -17,15 +17,12 @@ export default function SetupScreen() {
   const router = useRouter();
   const initGame = useGameStore((s) => s.initGame);
   const defaultPlayerCount = useSettingsStore((s) => s.playerCount);
-  const defaultTimerEnabled = useSettingsStore((s) => s.timerEnabled);
-
   const [playerCount, setPlayerCount] = useState(defaultPlayerCount);
   const [playerNames, setPlayerNames] = useState<string[]>(
     Array.from({ length: defaultPlayerCount }, (_, i) => `Speler ${i + 1}`)
   );
   const [selectedCategory, setSelectedCategory] = useState<string>('eten');
   const [impostersCount, setImpostersCount] = useState(1);
-  const [timerEnabled, setTimerEnabled] = useState(defaultTimerEnabled);
 
   const handlePlayerCountChange = useCallback((count: number) => {
     setPlayerCount(count);
@@ -66,7 +63,7 @@ export default function SetupScreen() {
       return finalName;
     });
 
-    initGame(uniqueNames, selectedCategory, impostersCount, timerEnabled);
+    initGame(uniqueNames, selectedCategory, impostersCount, false);
     router.replace('/game/pass');
   };
 
@@ -114,18 +111,6 @@ export default function SetupScreen() {
           onChange={setImpostersCount}
         />
 
-        <View style={styles.toggleRow}>
-          <Text style={styles.toggleLabel}>Timer</Text>
-          <Button
-            title={timerEnabled ? 'AAN' : 'UIT'}
-            onPress={() => setTimerEnabled(!timerEnabled)}
-            variant={timerEnabled ? 'primary' : 'secondary'}
-            size="sm"
-            fullWidth={false}
-            style={styles.toggleButton}
-          />
-        </View>
-
         <View style={styles.startButton}>
           <Button title="START SPEL" onPress={handleStart} size="lg" />
         </View>
@@ -160,23 +145,6 @@ const styles = StyleSheet.create({
   },
   categoryItem: {
     width: '48%',
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginTop: Spacing.md,
-  },
-  toggleLabel: {
-    color: Colors.text,
-    fontSize: FontSize.lg,
-    fontWeight: '600',
-  },
-  toggleButton: {
-    width: 80,
   },
   startButton: {
     marginTop: Spacing.xl,
