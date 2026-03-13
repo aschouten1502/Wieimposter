@@ -60,6 +60,7 @@ export default function ResultsScreen() {
 
   const civiliansWon = round.roundResult === 'civilians_win';
   const imposterGuessed = round.roundResult === 'imposter_guessed';
+  const isTrollRound = round.trollRound === true;
 
   const handleFinalGuess = () => {
     const correct = imposterFinalGuess(guessText);
@@ -101,7 +102,17 @@ export default function ResultsScreen() {
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {/* Result Header */}
         <View style={styles.resultHeader}>
-          {imposterGuessed ? (
+          {isTrollRound ? (
+            <>
+              <Text style={styles.resultEmoji}>🤡</Text>
+              <Text style={[styles.resultTitle, { color: Colors.accent }]}>
+                TROLL RONDE!
+              </Text>
+              <Text style={styles.trollSubtitle}>
+                Iedereen was imposter — niemand kende het woord!
+              </Text>
+            </>
+          ) : imposterGuessed ? (
             <>
               <Text style={styles.resultEmoji}>🧠</Text>
               <Text style={[styles.resultTitle, { color: Colors.imposter }]}>
@@ -254,6 +265,12 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 2,
     textAlign: 'center',
+  },
+  trollSubtitle: {
+    color: Colors.textSecondary,
+    fontSize: FontSize.md,
+    textAlign: 'center',
+    marginTop: Spacing.sm,
   },
   wordCard: {
     backgroundColor: Colors.surface,
