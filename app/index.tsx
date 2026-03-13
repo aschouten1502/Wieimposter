@@ -13,7 +13,7 @@ export default function HomeScreen() {
       <View style={styles.logoContainer}>
         <Text style={styles.emoji}>🕵️</Text>
         <Text style={styles.title}>WHO'S THE</Text>
-        <Text style={styles.titleAccent}>IMPOSTER</Text>
+        <Text style={styles.titleAccent} adjustsFontSizeToFit numberOfLines={1}>IMPOSTER</Text>
         <Text style={styles.subtitle}>De ultieme party game</Text>
       </View>
 

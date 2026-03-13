@@ -34,7 +34,7 @@ export function CategoryCard({ category, selected, onPress }: CategoryCardProps)
         </View>
       )}
       <Text style={styles.icon}>{category.icon}</Text>
-      <Text style={[styles.name, selected && styles.nameSelected]}>{category.name}</Text>
+      <Text style={[styles.name, selected && styles.nameSelected]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{category.name}</Text>
       <Text style={styles.count}>{category.words.length} woorden</Text>
     </TouchableOpacity>
   );
