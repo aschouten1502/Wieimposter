@@ -76,7 +76,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
 
-    const shuffledPlayers = shuffleArray(players);
+    const hintStartIndex = Math.floor(Math.random() * players.length);
 
     const round: Round = {
       categoryIds,
@@ -84,6 +84,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       secretWord: result.word,
       imposterIds,
       currentPlayerIndex: 0,
+      hintStartIndex,
       phase: 'passing',
       roundResult: null,
       votedPlayerId: null,
@@ -92,7 +93,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
     };
 
     set({
-      players: shuffledPlayers,
+      players,
       round,
       usedWords: [...usedWords, result.word],
     });
@@ -168,23 +169,21 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hasRevealed: false,
     }));
 
-    const shuffled = shuffleArray(resetPlayers);
-
     let imposterIds: string[];
     let finalPlayers: Player[];
 
     if (isTrollRound) {
-      imposterIds = shuffled.map((p) => p.id);
-      finalPlayers = shuffled.map((p) => ({ ...p, role: 'imposter' as Role }));
+      imposterIds = resetPlayers.map((p) => p.id);
+      finalPlayers = resetPlayers.map((p) => ({ ...p, role: 'imposter' as Role }));
     } else {
-      const shuffledIndices = shuffleArray(shuffled.map((_, i) => i));
+      const shuffledIndices = shuffleArray(resetPlayers.map((_, i) => i));
       const imposterCount = round.trollRound
-        ? Math.max(1, Math.floor(shuffled.length / 3))
+        ? Math.max(1, Math.floor(resetPlayers.length / 3))
         : round.imposterIds.length;
-      const imposterIndices = shuffledIndices.slice(0, Math.min(imposterCount, Math.max(1, Math.floor(shuffled.length / 3))));
+      const imposterIndices = shuffledIndices.slice(0, Math.min(imposterCount, Math.max(1, Math.floor(resetPlayers.length / 3))));
       imposterIds = [];
 
-      finalPlayers = shuffled.map((p, idx) => {
+      finalPlayers = resetPlayers.map((p, idx) => {
         if (imposterIndices.includes(idx)) {
           imposterIds.push(p.id);
           return { ...p, role: 'imposter' as Role };
@@ -192,6 +191,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         return p;
       });
     }
+
+    const hintStartIndex = Math.floor(Math.random() * finalPlayers.length);
 
     set({
       players: finalPlayers,
@@ -202,6 +203,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         secretWord: result.word,
         imposterIds,
         currentPlayerIndex: 0,
+        hintStartIndex,
         phase: 'passing',
         roundResult: null,
         votedPlayerId: null,

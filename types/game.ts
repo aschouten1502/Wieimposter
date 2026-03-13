@@ -38,6 +38,7 @@ export interface Round {
   secretWord: string;
   imposterIds: string[];
   currentPlayerIndex: number;
+  hintStartIndex: number;
   phase: GamePhase;
   roundResult: RoundResult | null;
   votedPlayerId: string | null;

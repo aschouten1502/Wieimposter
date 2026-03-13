@@ -18,6 +18,13 @@ export default function HintsScreen() {
     return null;
   }
 
+  // Reorder players starting from hintStartIndex
+  const startIdx = round.hintStartIndex;
+  const orderedPlayers = [
+    ...players.slice(startIdx),
+    ...players.slice(0, startIdx),
+  ];
+
   const handleDone = () => {
     setPhase('voting');
     router.replace('/game/vote');
@@ -36,13 +43,16 @@ export default function HintsScreen() {
 
       <View style={styles.playerList}>
         <Text style={styles.orderLabel}>Volgorde:</Text>
-        {players.map((player, index) => (
-          <PlayerBadge
-            key={player.id}
-            name={player.name}
-            index={index}
-          />
-        ))}
+        {orderedPlayers.map((player) => {
+          const originalIndex = players.findIndex((p) => p.id === player.id);
+          return (
+            <PlayerBadge
+              key={player.id}
+              name={player.name}
+              index={originalIndex}
+            />
+          );
+        })}
       </View>
 
       <View style={styles.buttonContainer}>

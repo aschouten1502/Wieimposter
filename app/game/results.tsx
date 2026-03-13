@@ -97,8 +97,6 @@ export default function ResultsScreen() {
               <Animated.Text
                 entering={FadeInDown.duration(500).delay(300)}
                 style={[styles.resultTitle, { color: Colors.accent, textShadowColor: Colors.accentGlow }]}
-                adjustsFontSizeToFit
-                numberOfLines={1}
               >
                 TROLL RONDE!
               </Animated.Text>
@@ -112,8 +110,6 @@ export default function ResultsScreen() {
               <Animated.Text
                 entering={FadeInDown.duration(500).delay(300)}
                 style={[styles.resultTitle, { color: Colors.imposter, textShadowColor: Colors.primaryGlow }]}
-                adjustsFontSizeToFit
-                numberOfLines={1}
               >
                 IMPOSTER RAADT HET!
               </Animated.Text>
@@ -124,8 +120,6 @@ export default function ResultsScreen() {
               <Animated.Text
                 entering={FadeInDown.duration(500).delay(300)}
                 style={[styles.resultTitle, { color: Colors.civilian }]}
-                adjustsFontSizeToFit
-                numberOfLines={1}
               >
                 BURGERS WINNEN!
               </Animated.Text>
@@ -136,8 +130,6 @@ export default function ResultsScreen() {
               <Animated.Text
                 entering={FadeInDown.duration(500).delay(300)}
                 style={[styles.resultTitle, { color: Colors.imposter, textShadowColor: Colors.primaryGlow }]}
-                adjustsFontSizeToFit
-                numberOfLines={1}
               >
                 IMPOSTER WINT!
               </Animated.Text>

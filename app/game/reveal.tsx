@@ -57,9 +57,7 @@ export default function RevealScreen() {
     markPlayerRevealed(currentPlayer.id);
 
     if (isLastPlayer) {
-      setCurrentPlayerIndex(0);
-      setPhase('hints');
-      router.replace('/game/hints');
+      router.replace('/game/hint-start');
     } else {
       nextPlayer();
       router.replace('/game/pass');
