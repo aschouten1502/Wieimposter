@@ -24,20 +24,9 @@ export default function ResultsScreen() {
   const resetGame = useGameStore((s) => s.resetGame);
   const recordGame = useStatsStore((s) => s.recordGame);
 
-  // Memoize vote results and imposters to avoid recalculation on every keystroke
-  const voteResults = useMemo(() => {
-    if (!round) return [];
-    const voteCounts: Record<string, number> = {};
-    players.forEach((p) => {
-      if (p.voteTargetId) {
-        voteCounts[p.voteTargetId] = (voteCounts[p.voteTargetId] || 0) + 1;
-      }
-    });
-    return players.map((p) => ({
-      playerId: p.id,
-      playerName: p.name,
-      voteCount: voteCounts[p.id] || 0,
-    })).sort((a, b) => b.voteCount - a.voteCount);
+  const votedPlayer = useMemo(() => {
+    if (!round?.votedPlayerId) return null;
+    return players.find((p) => p.id === round.votedPlayerId) ?? null;
   }, [players, round]);
 
   const imposters = useMemo(() => {
@@ -159,24 +148,18 @@ export default function ResultsScreen() {
           })}
         </View>
 
-        {/* Vote Tally */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Stemresultaten</Text>
-          {voteResults.map((result) => {
-            const index = players.findIndex((p) => p.id === result.playerId);
-            const isImp = round.imposterIds.includes(result.playerId);
-            return (
-              <PlayerBadge
-                key={result.playerId}
-                name={result.playerName}
-                index={index}
-                voteCount={result.voteCount}
-                isImposter={isImp}
-                showRole={true}
-              />
-            );
-          })}
-        </View>
+        {/* Voted Out */}
+        {votedPlayer && !isTrollRound && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Uitgestemd</Text>
+            <PlayerBadge
+              name={votedPlayer.name}
+              index={players.findIndex((p) => p.id === votedPlayer.id)}
+              isImposter={round.imposterIds.includes(votedPlayer.id)}
+              showRole={true}
+            />
+          </View>
+        )}
 
         {/* Final Guess (only if civilians won) */}
         {civiliansWon && guessResult === null && !showFinalGuess && (

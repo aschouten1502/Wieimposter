@@ -55,10 +55,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       name,
       role: 'civilian' as Role,
       score: 0,
-      hasVoted: false,
-      voteTargetId: null,
       hasRevealed: false,
-      hasGivenHint: false,
     }));
 
     let imposterIds: string[];
@@ -91,6 +88,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentPlayerIndex: 0,
       phase: 'passing',
       roundResult: null,
+      votedPlayerId: null,
+      trollModeEnabled: trollMode,
       trollRound: isTrollRound,
     };
 
@@ -166,18 +165,14 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const secretWord = getRandomWord(round.categoryId, usedWords);
 
-    // Troll mode: 15% chance if previous round had troll mode enabled
-    const wasTrollEnabled = round.trollRound !== undefined;
-    const isTrollRound = wasTrollEnabled && Math.random() < 0.15;
+    // Troll mode: 15% chance if troll mode was enabled by user
+    const isTrollRound = round.trollModeEnabled && Math.random() < 0.15;
 
     // Reset player states but keep scores — create fresh objects
     const resetPlayers: Player[] = players.map((p) => ({
       ...p,
       role: 'civilian' as Role,
-      hasVoted: false,
-      voteTargetId: null,
       hasRevealed: false,
-      hasGivenHint: false,
     }));
 
     // Shuffle play order
@@ -217,6 +212,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentPlayerIndex: 0,
         phase: 'passing',
         roundResult: null,
+        votedPlayerId: null,
+        trollModeEnabled: round.trollModeEnabled,
         trollRound: isTrollRound,
       },
       usedWords: [...usedWords, secretWord],

@@ -15,10 +15,7 @@ export interface Player {
   name: string;
   role: Role;
   score: number;
-  hasVoted: boolean;
-  voteTargetId: string | null;
   hasRevealed: boolean;
-  hasGivenHint: boolean;
 }
 
 export interface Category {
@@ -42,13 +39,9 @@ export interface Round {
   currentPlayerIndex: number;
   phase: GamePhase;
   roundResult: RoundResult | null;
-  trollRound?: boolean;
-}
-
-export interface VoteResult {
-  playerId: string;
-  playerName: string;
-  voteCount: number;
+  votedPlayerId: string | null;
+  trollModeEnabled: boolean;
+  trollRound: boolean;
 }
 
 export interface GameStats {
