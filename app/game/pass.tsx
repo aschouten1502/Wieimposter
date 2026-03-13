@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
-import { Colors, Spacing, FontSize } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { PLAYER_COLORS } from '@/constants/config';
 
@@ -26,10 +26,12 @@ export default function PassScreen() {
     <ScreenContainer centered>
       <View style={styles.content}>
         <Text style={styles.instruction}>Geef de telefoon aan</Text>
-        <Text style={[styles.playerName, { color }]}>{currentPlayer.name}</Text>
+        <Text style={[styles.playerName, { color, textShadowColor: color + '40' }]}>
+          {currentPlayer.name}
+        </Text>
         <Text style={styles.warning}>Zorg dat niemand meekijkt!</Text>
 
-        <View style={styles.progress}>
+        <View style={[styles.progress, Platform.OS === 'web' && (GlassStyle as any)]}>
           <Text style={styles.progressText}>
             Speler {round.currentPlayerIndex + 1} van {players.length}
           </Text>
@@ -56,7 +58,8 @@ const styles = StyleSheet.create({
   instruction: {
     color: Colors.textSecondary,
     fontSize: FontSize.xl,
-    fontWeight: '500',
+    fontWeight: '300',
+    letterSpacing: 1,
     marginBottom: Spacing.sm,
   },
   playerName: {
@@ -64,6 +67,8 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 2,
     textAlign: 'center',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 20,
   },
   warning: {
     color: Colors.textMuted,
@@ -73,10 +78,12 @@ const styles = StyleSheet.create({
   },
   progress: {
     marginTop: Spacing.xxl,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.glass,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
-    borderRadius: 20,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   progressText: {
     color: Colors.textSecondary,

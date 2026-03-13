@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { Stepper } from '@/components/Stepper';
 import { PlayerInput } from '@/components/PlayerInput';
 import { CategoryCard } from '@/components/CategoryCard';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { MIN_PLAYERS, MAX_PLAYERS } from '@/constants/config';
 import { categories } from '@/data/categories';
 import { useGameStore } from '@/store/gameStore';
@@ -21,7 +21,7 @@ export default function SetupScreen() {
   const [playerNames, setPlayerNames] = useState<string[]>(
     Array.from({ length: defaultPlayerCount }, (_, i) => `Speler ${i + 1}`)
   );
-  const [selectedCategory, setSelectedCategory] = useState<string>('eten');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(['eten']);
   const [impostersCount, setImpostersCount] = useState(1);
   const [trollMode, setTrollMode] = useState(false);
 
@@ -47,11 +47,19 @@ export default function SetupScreen() {
     });
   }, []);
 
+  const toggleCategory = useCallback((id: string) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(id)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((c) => c !== id);
+      }
+      return [...prev, id];
+    });
+  }, []);
+
   const handleStart = () => {
-    // Validate names
     const names = playerNames.map((n, i) => n.trim() || `Speler ${i + 1}`);
 
-    // Check for duplicates and fix
     const seen = new Set<string>();
     const uniqueNames = names.map((name) => {
       let finalName = name;
@@ -64,9 +72,14 @@ export default function SetupScreen() {
       return finalName;
     });
 
-    initGame(uniqueNames, selectedCategory, impostersCount, trollMode);
+    initGame(uniqueNames, selectedCategories, impostersCount, trollMode);
     router.replace('/game/pass');
   };
+
+  const totalWords = selectedCategories.reduce((sum, id) => {
+    const cat = categories.find((c) => c.id === id);
+    return sum + (cat?.words.length ?? 0);
+  }, 0);
 
   return (
     <ScreenContainer>
@@ -91,14 +104,19 @@ export default function SetupScreen() {
           />
         ))}
 
-        <Text style={styles.sectionLabel}>Categorie</Text>
+        <View style={styles.categoryHeader}>
+          <Text style={styles.sectionLabel}>Categorieën</Text>
+          <Text style={styles.categoryCount}>
+            {selectedCategories.length} geselecteerd · {totalWords} woorden
+          </Text>
+        </View>
         <View style={styles.categoryGrid}>
           {categories.map((cat) => (
             <View key={cat.id} style={styles.categoryItem}>
               <CategoryCard
                 category={cat}
-                selected={selectedCategory === cat.id}
-                onPress={setSelectedCategory}
+                selected={selectedCategories.includes(cat.id)}
+                onPress={toggleCategory}
               />
             </View>
           ))}
@@ -112,7 +130,7 @@ export default function SetupScreen() {
           onChange={setImpostersCount}
         />
 
-        <View style={styles.trollRow}>
+        <View style={[styles.trollRow, Platform.OS === 'web' && (GlassStyle as any)]}>
           <View style={styles.trollInfo}>
             <Text style={styles.trollLabel}>Troll Modus</Text>
             <Text style={styles.trollDesc}>Kans dat iedereen imposter is</Text>
@@ -153,6 +171,18 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     marginTop: Spacing.md,
   },
+  categoryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  categoryCount: {
+    color: Colors.textMuted,
+    fontSize: FontSize.xs,
+    fontWeight: '600',
+    marginBottom: Spacing.sm,
+    marginTop: Spacing.md,
+  },
   categoryGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -166,10 +196,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.glass,
     borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     marginTop: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   trollInfo: {
     flex: 1,

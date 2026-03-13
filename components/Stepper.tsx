@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useHaptics } from '@/hooks/useHaptics';
 
 interface StepperProps {
@@ -31,7 +31,7 @@ export function Stepper({ value, min, max, onChange, label }: StepperProps) {
   return (
     <View style={styles.container}>
       {label && <Text style={styles.label}>{label}</Text>}
-      <View style={styles.stepper}>
+      <View style={[styles.stepper, Platform.OS === 'web' && (GlassStyle as any)]}>
         <TouchableOpacity
           onPress={decrement}
           style={[styles.button, value <= min && styles.buttonDisabled]}
@@ -69,9 +69,11 @@ const styles = StyleSheet.create({
   stepper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.glass,
     borderRadius: BorderRadius.lg,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   button: {
     width: 56,

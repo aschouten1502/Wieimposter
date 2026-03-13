@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { categories } from '@/data/categories';
 
 export default function CategoriesScreen() {
@@ -18,7 +18,10 @@ export default function CategoriesScreen() {
         <Text style={styles.title}>Categorieën</Text>
 
         {categories.map((cat) => (
-          <View key={cat.id} style={styles.card}>
+          <View
+            key={cat.id}
+            style={[styles.card, Platform.OS === 'web' && (GlassStyle as any)]}
+          >
             <View style={styles.cardHeader}>
               <Text style={styles.icon}>{cat.icon}</Text>
               <View style={styles.cardInfo}>
@@ -65,10 +68,12 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   card: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.xl,
     padding: Spacing.lg,
     marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -108,6 +113,10 @@ const styles = StyleSheet.create({
   },
   tagMore: {
     backgroundColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
   },
   tagTextMore: {
     color: Colors.text,

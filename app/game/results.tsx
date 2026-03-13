@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TextInput, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { PlayerBadge } from '@/components/PlayerBadge';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { GlassCard } from '@/components/GlassCard';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { useStatsStore } from '@/store/statsStore';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -34,7 +35,6 @@ export default function ResultsScreen() {
     return players.filter((p) => round.imposterIds.includes(p.id));
   }, [players, round]);
 
-  // Haptic feedback on mount
   useEffect(() => {
     if (round?.roundResult && !hapticsTriggered.current) {
       haptics.heavy();
@@ -61,7 +61,6 @@ export default function ResultsScreen() {
     }
   };
 
-  // Record stats when leaving (captures final guess result too)
   const recordAndProceed = (callback: () => void) => {
     if (round.roundResult) {
       recordGame(
@@ -94,7 +93,7 @@ export default function ResultsScreen() {
           {isTrollRound ? (
             <>
               <Text style={styles.resultEmoji}>🤡</Text>
-              <Text style={[styles.resultTitle, { color: Colors.accent }]}>
+              <Text style={[styles.resultTitle, { color: Colors.accent, textShadowColor: Colors.accentGlow }]}>
                 TROLL RONDE!
               </Text>
               <Text style={styles.trollSubtitle}>
@@ -104,7 +103,7 @@ export default function ResultsScreen() {
           ) : imposterGuessed ? (
             <>
               <Text style={styles.resultEmoji}>🧠</Text>
-              <Text style={[styles.resultTitle, { color: Colors.imposter }]}>
+              <Text style={[styles.resultTitle, { color: Colors.imposter, textShadowColor: Colors.primaryGlow }]}>
                 IMPOSTER RAADT HET WOORD!
               </Text>
             </>
@@ -118,7 +117,7 @@ export default function ResultsScreen() {
           ) : (
             <>
               <Text style={styles.resultEmoji}>🕵️</Text>
-              <Text style={[styles.resultTitle, { color: Colors.imposter }]}>
+              <Text style={[styles.resultTitle, { color: Colors.imposter, textShadowColor: Colors.primaryGlow }]}>
                 IMPOSTER WINT!
               </Text>
             </>
@@ -126,10 +125,10 @@ export default function ResultsScreen() {
         </View>
 
         {/* Secret Word */}
-        <View style={styles.wordCard}>
+        <GlassCard style={styles.wordCard}>
           <Text style={styles.wordLabel}>Het geheime woord was:</Text>
           <Text style={styles.wordValue}>{round.secretWord}</Text>
-        </View>
+        </GlassCard>
 
         {/* Imposter Reveal */}
         <View style={styles.section}>
@@ -161,10 +160,10 @@ export default function ResultsScreen() {
           </View>
         )}
 
-        {/* Final Guess (only if civilians won) */}
+        {/* Final Guess */}
         {civiliansWon && guessResult === null && !showFinalGuess && (
           <Button
-            title="IMPOSTER MAG RADEN"
+            title="IMPOSTER RAADT"
             onPress={() => setShowFinalGuess(true)}
             variant="secondary"
             size="md"
@@ -172,7 +171,7 @@ export default function ResultsScreen() {
         )}
 
         {showFinalGuess && guessResult === null && (
-          <View style={styles.guessContainer}>
+          <GlassCard style={styles.guessCard}>
             <Text style={styles.guessLabel}>Imposter, raad het woord:</Text>
             <TextInput
               style={styles.guessInput}
@@ -189,30 +188,30 @@ export default function ResultsScreen() {
               disabled={!guessText.trim()}
               size="md"
             />
-          </View>
+          </GlassCard>
         )}
 
         {guessResult !== null && (
-          <View style={styles.guessResultContainer}>
+          <GlassCard style={styles.guessResultCard}>
             <Text style={[styles.guessResultText, guessResult ? styles.guessCorrect : styles.guessWrong]}>
               {guessResult ? 'CORRECT! Imposter wint alsnog!' : 'FOUT! Het was niet het juiste woord.'}
             </Text>
-          </View>
+          </GlassCard>
         )}
 
         {/* Scores */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Scores</Text>
-          {[...players].sort((a, b) => b.score - a.score).map((player) => {
-            const index = players.findIndex((p) => p.id === player.id);
-            return (
-              <View key={player.id} style={styles.scoreRow}>
-                <View style={[styles.scoreDot, { backgroundColor: Colors.text }]} />
-                <Text style={styles.scoreName}>{player.name}</Text>
-                <Text style={styles.scoreValue}>{player.score}</Text>
-              </View>
-            );
-          })}
+          {[...players].sort((a, b) => b.score - a.score).map((player) => (
+            <View
+              key={player.id}
+              style={[styles.scoreRow, Platform.OS === 'web' && (GlassStyle as any)]}
+            >
+              <View style={[styles.scoreDot, { backgroundColor: Colors.text }]} />
+              <Text style={styles.scoreName}>{player.name}</Text>
+              <Text style={styles.scoreValue}>{player.score}</Text>
+            </View>
+          ))}
         </View>
 
         {/* Actions */}
@@ -248,6 +247,8 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 2,
     textAlign: 'center',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 30,
   },
   trollSubtitle: {
     color: Colors.textSecondary,
@@ -256,9 +257,6 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
   },
   wordCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.xl,
-    padding: Spacing.xl,
     alignItems: 'center',
     marginBottom: Spacing.xl,
   },
@@ -272,6 +270,9 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xxxl,
     fontWeight: '900',
     letterSpacing: 2,
+    textShadowColor: Colors.accentGlow,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 20,
   },
   section: {
     marginBottom: Spacing.xl,
@@ -283,10 +284,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.sm,
     letterSpacing: 1,
   },
-  guessContainer: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
+  guessCard: {
     marginBottom: Spacing.xl,
     gap: Spacing.md,
   },
@@ -302,8 +300,10 @@ const styles = StyleSheet.create({
     fontSize: FontSize.xl,
     padding: Spacing.md,
     fontWeight: '600',
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
-  guessResultContainer: {
+  guessResultCard: {
     marginBottom: Spacing.xl,
     alignItems: 'center',
   },
@@ -321,10 +321,12 @@ const styles = StyleSheet.create({
   scoreRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.glass,
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
     marginBottom: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   scoreDot: {
     width: 8,

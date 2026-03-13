@@ -31,6 +31,27 @@ export const categories: Category[] = [
       { id: 'e22', value: 'Poké Bowl', difficulty: 'medium' },
       { id: 'e23', value: 'Shoarma', difficulty: 'easy' },
       { id: 'e24', value: 'Dim Sum', difficulty: 'medium' },
+      { id: 'e25', value: 'Nachos', difficulty: 'easy' },
+      { id: 'e26', value: 'Risotto', difficulty: 'medium' },
+      { id: 'e27', value: 'Falafel', difficulty: 'easy' },
+      { id: 'e28', value: 'Churros', difficulty: 'easy' },
+      { id: 'e29', value: 'Pad Thai', difficulty: 'medium' },
+      { id: 'e30', value: 'Hummus', difficulty: 'easy' },
+      { id: 'e31', value: 'Carpaccio', difficulty: 'medium' },
+      { id: 'e32', value: 'Kaassoufflé', difficulty: 'easy' },
+      { id: 'e33', value: 'Boerenkool', difficulty: 'easy' },
+      { id: 'e34', value: 'Mochi', difficulty: 'medium' },
+      { id: 'e35', value: 'Empanada', difficulty: 'medium' },
+      { id: 'e36', value: 'Gyoza', difficulty: 'medium' },
+      { id: 'e37', value: 'Smoothie', difficulty: 'easy' },
+      { id: 'e38', value: 'Bruschetta', difficulty: 'medium' },
+      { id: 'e39', value: 'Rendang', difficulty: 'medium' },
+      { id: 'e40', value: 'Wok', difficulty: 'easy' },
+      { id: 'e41', value: 'Tzatziki', difficulty: 'medium' },
+      { id: 'e42', value: 'Frietjes', difficulty: 'easy' },
+      { id: 'e43', value: 'Wrap', difficulty: 'easy' },
+      { id: 'e44', value: 'Baklava', difficulty: 'medium' },
+      { id: 'e45', value: 'Espresso', difficulty: 'easy' },
     ],
   },
   {
@@ -59,6 +80,26 @@ export const categories: Category[] = [
       { id: 'b18', value: 'Tattoo Artist', difficulty: 'medium' },
       { id: 'b19', value: 'Personal Trainer', difficulty: 'easy' },
       { id: 'b20', value: 'Barista', difficulty: 'easy' },
+      { id: 'b21', value: 'Architect', difficulty: 'medium' },
+      { id: 'b22', value: 'Makelaar', difficulty: 'easy' },
+      { id: 'b23', value: 'Fotograaf', difficulty: 'easy' },
+      { id: 'b24', value: 'Vlogger', difficulty: 'easy' },
+      { id: 'b25', value: 'Stylist', difficulty: 'easy' },
+      { id: 'b26', value: 'Monteur', difficulty: 'easy' },
+      { id: 'b27', value: 'Verpleger', difficulty: 'easy' },
+      { id: 'b28', value: 'Rechter', difficulty: 'medium' },
+      { id: 'b29', value: 'Bioloog', difficulty: 'medium' },
+      { id: 'b30', value: 'Journalist', difficulty: 'easy' },
+      { id: 'b31', value: 'Apotheker', difficulty: 'easy' },
+      { id: 'b32', value: 'Acteur', difficulty: 'easy' },
+      { id: 'b33', value: 'Programmeur', difficulty: 'easy' },
+      { id: 'b34', value: 'Stewardess', difficulty: 'easy' },
+      { id: 'b35', value: 'Boer', difficulty: 'easy' },
+      { id: 'b36', value: 'Visser', difficulty: 'easy' },
+      { id: 'b37', value: 'Loodgieter', difficulty: 'easy' },
+      { id: 'b38', value: 'Presentator', difficulty: 'easy' },
+      { id: 'b39', value: 'Rapper', difficulty: 'easy' },
+      { id: 'b40', value: 'Chauffeur', difficulty: 'easy' },
     ],
   },
   {
@@ -87,6 +128,26 @@ export const categories: Category[] = [
       { id: 'l18', value: 'Amerika', difficulty: 'easy' },
       { id: 'l19', value: 'Frankrijk', difficulty: 'easy' },
       { id: 'l20', value: 'Curaçao', difficulty: 'easy' },
+      { id: 'l21', value: 'Portugal', difficulty: 'easy' },
+      { id: 'l22', value: 'Argentinië', difficulty: 'easy' },
+      { id: 'l23', value: 'Vietnam', difficulty: 'easy' },
+      { id: 'l24', value: 'Colombia', difficulty: 'medium' },
+      { id: 'l25', value: 'Kroatië', difficulty: 'medium' },
+      { id: 'l26', value: 'Zweden', difficulty: 'easy' },
+      { id: 'l27', value: 'Polen', difficulty: 'easy' },
+      { id: 'l28', value: 'Kenia', difficulty: 'medium' },
+      { id: 'l29', value: 'China', difficulty: 'easy' },
+      { id: 'l30', value: 'Suriname', difficulty: 'easy' },
+      { id: 'l31', value: 'Rusland', difficulty: 'easy' },
+      { id: 'l32', value: 'Ierland', difficulty: 'easy' },
+      { id: 'l33', value: 'Zuid-Korea', difficulty: 'easy' },
+      { id: 'l34', value: 'Indonesië', difficulty: 'easy' },
+      { id: 'l35', value: 'Ijsland', difficulty: 'medium' },
+      { id: 'l36', value: 'Peru', difficulty: 'easy' },
+      { id: 'l37', value: 'Cuba', difficulty: 'easy' },
+      { id: 'l38', value: 'Nieuw-Zeeland', difficulty: 'easy' },
+      { id: 'l39', value: 'België', difficulty: 'easy' },
+      { id: 'l40', value: 'Dubai', difficulty: 'easy' },
     ],
   },
   {
@@ -115,6 +176,26 @@ export const categories: Category[] = [
       { id: 'd18', value: 'Stokstaartje', difficulty: 'easy' },
       { id: 'd19', value: 'Ijsbeer', difficulty: 'easy' },
       { id: 'd20', value: 'Kat', difficulty: 'easy' },
+      { id: 'd21', value: 'Wasbeer', difficulty: 'easy' },
+      { id: 'd22', value: 'Zeehond', difficulty: 'easy' },
+      { id: 'd23', value: 'Pelikaan', difficulty: 'medium' },
+      { id: 'd24', value: 'Narwal', difficulty: 'medium' },
+      { id: 'd25', value: 'Quokka', difficulty: 'medium' },
+      { id: 'd26', value: 'Axolotl', difficulty: 'medium' },
+      { id: 'd27', value: 'Rode Panda', difficulty: 'easy' },
+      { id: 'd28', value: 'Hyena', difficulty: 'easy' },
+      { id: 'd29', value: 'Kangoeroe', difficulty: 'easy' },
+      { id: 'd30', value: 'Zeepaard', difficulty: 'easy' },
+      { id: 'd31', value: 'Leeuw', difficulty: 'easy' },
+      { id: 'd32', value: 'Olifant', difficulty: 'easy' },
+      { id: 'd33', value: 'Wolf', difficulty: 'easy' },
+      { id: 'd34', value: 'Egel', difficulty: 'easy' },
+      { id: 'd35', value: 'Hamster', difficulty: 'easy' },
+      { id: 'd36', value: 'Giraffe', difficulty: 'easy' },
+      { id: 'd37', value: 'Slang', difficulty: 'easy' },
+      { id: 'd38', value: 'Eend', difficulty: 'easy' },
+      { id: 'd39', value: 'Mantarog', difficulty: 'medium' },
+      { id: 'd40', value: 'Cheetah', difficulty: 'easy' },
     ],
   },
   {
@@ -145,6 +226,24 @@ export const categories: Category[] = [
       { id: 'f20', value: 'Prison Break', difficulty: 'easy' },
       { id: 'f21', value: 'Avengers', difficulty: 'easy' },
       { id: 'f22', value: 'The Walking Dead', difficulty: 'easy' },
+      { id: 'f23', value: 'Oppenheimer', difficulty: 'easy' },
+      { id: 'f24', value: 'Barbie', difficulty: 'easy' },
+      { id: 'f25', value: 'Top Gun', difficulty: 'easy' },
+      { id: 'f26', value: 'Bridgerton', difficulty: 'easy' },
+      { id: 'f27', value: 'Lupin', difficulty: 'easy' },
+      { id: 'f28', value: 'Dark', difficulty: 'medium' },
+      { id: 'f29', value: 'The Witcher', difficulty: 'easy' },
+      { id: 'f30', value: 'Batman', difficulty: 'easy' },
+      { id: 'f31', value: 'John Wick', difficulty: 'easy' },
+      { id: 'f32', value: 'Jurassic Park', difficulty: 'easy' },
+      { id: 'f33', value: 'Star Wars', difficulty: 'easy' },
+      { id: 'f34', value: 'The Matrix', difficulty: 'easy' },
+      { id: 'f35', value: 'Rick and Morty', difficulty: 'easy' },
+      { id: 'f36', value: 'Attack on Titan', difficulty: 'easy' },
+      { id: 'f37', value: 'Demon Slayer', difficulty: 'easy' },
+      { id: 'f38', value: 'Inside Out', difficulty: 'easy' },
+      { id: 'f39', value: 'Black Mirror', difficulty: 'easy' },
+      { id: 'f40', value: 'The Boys', difficulty: 'easy' },
     ],
   },
   {
@@ -173,6 +272,26 @@ export const categories: Category[] = [
       { id: 's18', value: 'Honkbal', difficulty: 'easy' },
       { id: 's19', value: 'Kickboksen', difficulty: 'easy' },
       { id: 's20', value: 'Zeilen', difficulty: 'medium' },
+      { id: 's21', value: 'Schermen', difficulty: 'medium' },
+      { id: 's22', value: 'Klimmen', difficulty: 'easy' },
+      { id: 's23', value: 'Judo', difficulty: 'easy' },
+      { id: 's24', value: 'Badminton', difficulty: 'easy' },
+      { id: 's25', value: 'Handbal', difficulty: 'easy' },
+      { id: 's26', value: 'Cricket', difficulty: 'medium' },
+      { id: 's27', value: 'Triatlon', difficulty: 'medium' },
+      { id: 's28', value: 'Wielrennen', difficulty: 'easy' },
+      { id: 's29', value: 'Tafeltennis', difficulty: 'easy' },
+      { id: 's30', value: 'Worstelen', difficulty: 'easy' },
+      { id: 's31', value: 'Ijshockey', difficulty: 'easy' },
+      { id: 's32', value: 'Boulderen', difficulty: 'easy' },
+      { id: 's33', value: 'CrossFit', difficulty: 'easy' },
+      { id: 's34', value: 'Skiën', difficulty: 'easy' },
+      { id: 's35', value: 'Karate', difficulty: 'easy' },
+      { id: 's36', value: 'Polo', difficulty: 'medium' },
+      { id: 's37', value: 'Waterpolo', difficulty: 'easy' },
+      { id: 's38', value: 'Atletiek', difficulty: 'easy' },
+      { id: 's39', value: 'Yoga', difficulty: 'easy' },
+      { id: 's40', value: 'Roeien', difficulty: 'easy' },
     ],
   },
   {
@@ -201,6 +320,26 @@ export const categories: Category[] = [
       { id: 'm18', value: 'YouTube', difficulty: 'easy' },
       { id: 'm19', value: 'Tinder', difficulty: 'easy' },
       { id: 'm20', value: 'Red Bull', difficulty: 'easy' },
+      { id: 'm21', value: 'Shein', difficulty: 'easy' },
+      { id: 'm22', value: 'BeReal', difficulty: 'easy' },
+      { id: 'm23', value: 'ChatGPT', difficulty: 'easy' },
+      { id: 'm24', value: 'Airbnb', difficulty: 'easy' },
+      { id: 'm25', value: 'Starbucks', difficulty: 'easy' },
+      { id: 'm26', value: 'Samsung', difficulty: 'easy' },
+      { id: 'm27', value: 'Nintendo', difficulty: 'easy' },
+      { id: 'm28', value: 'Bol.com', difficulty: 'easy' },
+      { id: 'm29', value: 'Disney+', difficulty: 'easy' },
+      { id: 'm30', value: 'H&M', difficulty: 'easy' },
+      { id: 'm31', value: 'Twitch', difficulty: 'easy' },
+      { id: 'm32', value: 'Uber Eats', difficulty: 'easy' },
+      { id: 'm33', value: 'Google', difficulty: 'easy' },
+      { id: 'm34', value: 'Xbox', difficulty: 'easy' },
+      { id: 'm35', value: 'KFC', difficulty: 'easy' },
+      { id: 'm36', value: 'Gucci', difficulty: 'easy' },
+      { id: 'm37', value: 'Duolingo', difficulty: 'easy' },
+      { id: 'm38', value: 'Primark', difficulty: 'easy' },
+      { id: 'm39', value: 'Gorillas', difficulty: 'easy' },
+      { id: 'm40', value: 'Louis Vuitton', difficulty: 'medium' },
     ],
   },
   {
@@ -229,6 +368,26 @@ export const categories: Category[] = [
       { id: 'bp18', value: 'Conor McGregor', difficulty: 'easy' },
       { id: 'bp19', value: 'Kanye West', difficulty: 'easy' },
       { id: 'bp20', value: 'Neymar', difficulty: 'easy' },
+      { id: 'bp21', value: 'Zendaya', difficulty: 'easy' },
+      { id: 'bp22', value: 'Dua Lipa', difficulty: 'easy' },
+      { id: 'bp23', value: 'Travis Scott', difficulty: 'easy' },
+      { id: 'bp24', value: 'Bad Bunny', difficulty: 'easy' },
+      { id: 'bp25', value: 'Virgil van Dijk', difficulty: 'easy' },
+      { id: 'bp26', value: 'Frenkie de Jong', difficulty: 'easy' },
+      { id: 'bp27', value: 'Gigi Hadid', difficulty: 'easy' },
+      { id: 'bp28', value: 'LeBron James', difficulty: 'easy' },
+      { id: 'bp29', value: 'Kylie Jenner', difficulty: 'easy' },
+      { id: 'bp30', value: 'Eminem', difficulty: 'easy' },
+      { id: 'bp31', value: 'Lewis Hamilton', difficulty: 'easy' },
+      { id: 'bp32', value: 'Shakira', difficulty: 'easy' },
+      { id: 'bp33', value: 'Mbappé', difficulty: 'easy' },
+      { id: 'bp34', value: 'Selena Gomez', difficulty: 'easy' },
+      { id: 'bp35', value: 'Will Smith', difficulty: 'easy' },
+      { id: 'bp36', value: 'Nikkie de Jager', difficulty: 'easy' },
+      { id: 'bp37', value: 'Haaland', difficulty: 'easy' },
+      { id: 'bp38', value: 'Ed Sheeran', difficulty: 'easy' },
+      { id: 'bp39', value: 'Khaby Lame', difficulty: 'easy' },
+      { id: 'bp40', value: 'Kylian Mbappé', difficulty: 'easy' },
     ],
   },
 ];
@@ -238,17 +397,28 @@ export function getCategoryById(id: string): Category | undefined {
 }
 
 export function getRandomWord(categoryId: string, exclude: string[] = []): string {
-  const category = getCategoryById(categoryId);
-  if (!category || category.words.length === 0) {
-    // Fallback to first available category
-    const fallback = categories.find((c) => c.words.length > 0);
-    if (!fallback) return 'Onbekend';
-    return fallback.words[Math.floor(Math.random() * fallback.words.length)].value;
+  const result = getRandomWordFromCategories([categoryId], exclude);
+  return result.word;
+}
+
+export function getRandomWordFromCategories(
+  categoryIds: string[],
+  exclude: string[] = [],
+): { word: string; categoryId: string } {
+  const allWords = categoryIds.flatMap((id) => {
+    const cat = getCategoryById(id);
+    if (!cat) return [];
+    return cat.words.map((w) => ({ value: w.value, categoryId: id }));
+  });
+
+  if (allWords.length === 0) {
+    const fallback = categories[0];
+    const pick = fallback.words[Math.floor(Math.random() * fallback.words.length)];
+    return { word: pick.value, categoryId: fallback.id };
   }
-  const available = category.words.filter((w) => !exclude.includes(w.value));
-  if (available.length === 0) {
-    // All words used — reset exclusion and pick any word
-    return category.words[Math.floor(Math.random() * category.words.length)].value;
-  }
-  return available[Math.floor(Math.random() * available.length)].value;
+
+  const available = allWords.filter((w) => !exclude.includes(w.value));
+  const pool = available.length > 0 ? available : allWords;
+  const pick = pool[Math.floor(Math.random() * pool.length)];
+  return { word: pick.value, categoryId: pick.categoryId };
 }

@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { PlayerBadge } from '@/components/PlayerBadge';
-import { Colors, Spacing, FontSize } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 
@@ -26,11 +26,9 @@ export default function VoteScreen() {
     if (!selectedId) return;
     haptics.heavy();
 
-    // Check if the selected player is the imposter
     const isImposter = round.imposterIds.includes(selectedId);
     const result = isImposter ? 'civilians_win' : 'imposter_wins';
 
-    // Update scores
     const updatedPlayers = players.map((p) => {
       if (result === 'civilians_win' && p.role === 'civilian') {
         return { ...p, score: p.score + 1 };
@@ -51,7 +49,7 @@ export default function VoteScreen() {
 
   return (
     <ScreenContainer>
-      <View style={styles.header}>
+      <View style={[styles.header, Platform.OS === 'web' && (GlassStyle as any)]}>
         <Text style={styles.phase}>STEMMEN</Text>
         <Text style={styles.emoji}>👆</Text>
         <Text style={styles.title}>Wijs tegelijk aan!</Text>
@@ -93,6 +91,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.md,
     marginBottom: Spacing.lg,
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.xl,
+    padding: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   phase: {
     color: Colors.accent,

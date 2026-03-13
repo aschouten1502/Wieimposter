@@ -33,7 +33,8 @@ export interface Word {
 }
 
 export interface Round {
-  categoryId: string;
+  categoryIds: string[];
+  sourceCategoryId: string;
   secretWord: string;
   imposterIds: string[];
   currentPlayerIndex: number;
