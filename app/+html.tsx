@@ -21,17 +21,15 @@ export default function Root({ children }: { children: React.ReactNode }) {
             background-color: #0A0A1A;
             margin: 0;
             padding: 0;
-          }
-          body {
             overflow: hidden;
-            padding-bottom: env(safe-area-inset-bottom);
           }
           #root {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             display: flex;
-            height: 100%;
-            min-height: 100vh;
-            min-height: -webkit-fill-available;
-            flex: 1;
             background-color: #0A0A1A;
           }
         `}} />

@@ -7,7 +7,6 @@ import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { PLAYER_COLORS } from '@/constants/config';
-import { getCategoryById } from '@/data/categories';
 
 export default function RevealScreen() {
   const router = useRouter();
@@ -31,9 +30,6 @@ export default function RevealScreen() {
 
   const isImposter = round.imposterIds.includes(currentPlayer.id);
   const isTrollRound = round.trollRound === true;
-  const category = getCategoryById(round.sourceCategoryId);
-  const categoryName = category?.name ?? '';
-  const hasMultipleCategories = round.categoryIds.length > 1;
   const playerIndex = players.findIndex((p) => p.id === currentPlayer.id);
   const color = PLAYER_COLORS[playerIndex % PLAYER_COLORS.length];
   const isLastPlayer = round.currentPlayerIndex >= players.length - 1;
@@ -142,19 +138,15 @@ export default function RevealScreen() {
                 <View style={styles.hintBox}>
                   <Text style={styles.hintText}>Plot twist: iedereen is imposter!</Text>
                 </View>
-              ) : hasMultipleCategories ? (
+              ) : (
                 <>
                   <View style={styles.categoryPill}>
-                    <Text style={styles.categoryText}>{categoryName}</Text>
+                    <Text style={styles.categoryText}>{round.imposterHint}</Text>
                   </View>
                   <View style={styles.hintBox}>
-                    <Text style={styles.hintText}>Het woord komt uit deze categorie. Bluf mee!</Text>
+                    <Text style={styles.hintText}>Dit is je enige aanwijzing. Bluf mee!</Text>
                   </View>
                 </>
-              ) : (
-                <View style={styles.hintBox}>
-                  <Text style={styles.hintText}>Je kent het woord niet. Bluf mee!</Text>
-                </View>
               )}
             </View>
           ) : (

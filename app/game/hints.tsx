@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
@@ -12,6 +12,7 @@ export default function HintsScreen() {
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
   const setPhase = useGameStore((s) => s.setPhase);
+  const [hintRound, setHintRound] = useState(1);
 
   if (!round) {
     router.replace('/');
@@ -25,6 +26,10 @@ export default function HintsScreen() {
     ...players.slice(0, startIdx),
   ];
 
+  const handleNextHintRound = () => {
+    setHintRound(hintRound + 1);
+  };
+
   const handleDone = () => {
     setPhase('voting');
     router.replace('/game/vote');
@@ -33,8 +38,8 @@ export default function HintsScreen() {
   return (
     <ScreenContainer>
       <View style={[styles.header, Platform.OS === 'web' && (GlassStyle as any)]}>
-        <Text style={styles.phase}>HINT RONDE</Text>
-        <Text style={styles.title} adjustsFontSizeToFit numberOfLines={1}>Geef om de beurt 2 woorden!</Text>
+        <Text style={styles.phase}>HINT RONDE {hintRound}</Text>
+        <Text style={styles.title}>Geef om de beurt 1 hint!</Text>
         <Text style={styles.subtitle}>
           Begin bij de eerste speler en ga de kring rond.{'\n'}
           Geef subtiele hints — niet te makkelijk!
@@ -56,6 +61,12 @@ export default function HintsScreen() {
       </View>
 
       <View style={styles.buttonContainer}>
+        <Button
+          title="NOG EEN RONDE"
+          onPress={handleNextHintRound}
+          variant="secondary"
+          size="md"
+        />
         <Button
           title="GA STEMMEN"
           onPress={handleDone}
@@ -110,5 +121,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     paddingBottom: Spacing.lg,
+    gap: Spacing.sm,
   },
 });

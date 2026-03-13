@@ -18,7 +18,7 @@ export function ScreenContainer({ children, style, centered }: ScreenContainerPr
       end={{ x: 1, y: 1 }}
       style={styles.gradient}
     >
-      <SafeAreaView style={styles.safe}>
+      <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
         <View style={[styles.container, centered && styles.centered, style]}>
           {children}
         </View>

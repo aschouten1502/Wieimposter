@@ -218,23 +218,8 @@ export default function ResultsScreen() {
           </Animated.View>
         )}
 
-        {/* Scores */}
-        <Animated.View entering={FadeInUp.duration(400).delay(1200)} style={styles.section}>
-          <Text style={styles.sectionTitle}>Scores</Text>
-          {[...players].sort((a, b) => b.score - a.score).map((player) => (
-            <View
-              key={player.id}
-              style={[styles.scoreRow, Platform.OS === 'web' && (GlassStyle as any)]}
-            >
-              <View style={[styles.scoreDot, { backgroundColor: Colors.text }]} />
-              <Text style={styles.scoreName}>{player.name}</Text>
-              <Text style={styles.scoreValue}>{player.score}</Text>
-            </View>
-          ))}
-        </Animated.View>
-
         {/* Actions */}
-        <Animated.View entering={FadeInUp.duration(400).delay(1400)} style={styles.actions}>
+        <Animated.View entering={FadeInUp.duration(400).delay(1200)} style={styles.actions}>
           <Button title="VOLGENDE RONDE" onPress={handleNextRound} size="lg" />
           <Button
             title="NIEUW SPEL"
@@ -336,33 +321,6 @@ const styles = StyleSheet.create({
   },
   guessWrong: {
     color: Colors.civilian,
-  },
-  scoreRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.glass,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.xs,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
-  },
-  scoreDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: Spacing.sm,
-  },
-  scoreName: {
-    color: Colors.text,
-    fontSize: FontSize.lg,
-    fontWeight: '600',
-    flex: 1,
-  },
-  scoreValue: {
-    color: Colors.accent,
-    fontSize: FontSize.xl,
-    fontWeight: '900',
   },
   actions: {
     gap: Spacing.md,

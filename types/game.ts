@@ -29,6 +29,7 @@ export interface Category {
 export interface Word {
   id: string;
   value: string;
+  hint: string;
   difficulty: 'easy' | 'medium' | 'hard';
 }
 
@@ -36,6 +37,7 @@ export interface Round {
   categoryIds: string[];
   sourceCategoryId: string;
   secretWord: string;
+  imposterHint: string;
   imposterIds: string[];
   currentPlayerIndex: number;
   hintStartIndex: number;
