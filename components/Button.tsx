@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import {
-  TouchableOpacity,
+  Animated,
   Text,
   StyleSheet,
   ViewStyle,
   TextStyle,
   ActivityIndicator,
   Platform,
+  Pressable,
 } from 'react-native';
 import { Colors, Spacing, FontSize, BorderRadius, ButtonHeight, GlassStyle } from '@/constants/theme';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -38,6 +39,23 @@ export function Button({
   fullWidth = true,
 }: ButtonProps) {
   const haptics = useHaptics();
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 0.96,
+      friction: 8,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scaleAnim, {
+      toValue: 1,
+      friction: 5,
+      useNativeDriver: true,
+    }).start();
+  };
 
   const handlePress = () => {
     if (disabled || loading) return;
@@ -48,28 +66,38 @@ export function Button({
   const isGlass = variant === 'secondary' || variant === 'ghost';
 
   return (
-    <TouchableOpacity
+    <Pressable
       onPress={handlePress}
+      onPressIn={handlePressIn}
+      onPressOut={handlePressOut}
       disabled={disabled || loading}
-      activeOpacity={0.7}
-      style={[
-        styles.base,
-        styles[variant],
-        styles[`size_${size}`],
-        fullWidth && styles.fullWidth,
-        disabled && styles.disabled,
-        isGlass && Platform.OS === 'web' && (GlassStyle as ViewStyle),
-        style,
-      ]}
     >
-      {loading ? (
-        <ActivityIndicator color={Colors.text} />
-      ) : (
-        <Text style={[styles.text, styles[`text_${variant}`], styles[`text_${size}`], textStyle]}>
-          {title}
-        </Text>
-      )}
-    </TouchableOpacity>
+      <Animated.View
+        style={[
+          styles.base,
+          styles[variant],
+          styles[`size_${size}`],
+          fullWidth && styles.fullWidth,
+          disabled && styles.disabled,
+          isGlass && Platform.OS === 'web' && (GlassStyle as ViewStyle),
+          { transform: [{ scale: scaleAnim }] },
+          style,
+        ]}
+      >
+        {loading ? (
+          <ActivityIndicator color={Colors.text} />
+        ) : (
+          <Text
+            numberOfLines={1}
+            adjustsFontSizeToFit
+            minimumFontScale={0.7}
+            style={[styles.text, styles[`text_${variant}`], styles[`text_${size}`], textStyle]}
+          >
+            {title}
+          </Text>
+        )}
+      </Animated.View>
+    </Pressable>
   );
 }
 

@@ -31,8 +31,9 @@ export default function RevealScreen() {
 
   const isImposter = round.imposterIds.includes(currentPlayer.id);
   const isTrollRound = round.trollRound === true;
-  const category = getCategoryById(round.categoryId);
+  const category = getCategoryById(round.sourceCategoryId);
   const categoryName = category?.name ?? '';
+  const hasMultipleCategories = round.categoryIds.length > 1;
   const playerIndex = players.findIndex((p) => p.id === currentPlayer.id);
   const color = PLAYER_COLORS[playerIndex % PLAYER_COLORS.length];
   const isLastPlayer = round.currentPlayerIndex >= players.length - 1;
@@ -143,15 +144,19 @@ export default function RevealScreen() {
                 <View style={styles.hintBox}>
                   <Text style={styles.hintText}>Plot twist: iedereen is imposter!</Text>
                 </View>
-              ) : (
+              ) : hasMultipleCategories ? (
                 <>
                   <View style={styles.categoryPill}>
                     <Text style={styles.categoryText}>{categoryName}</Text>
                   </View>
                   <View style={styles.hintBox}>
-                    <Text style={styles.hintText}>Je kent het woord niet. Bluf mee!</Text>
+                    <Text style={styles.hintText}>Het woord komt uit deze categorie. Bluf mee!</Text>
                   </View>
                 </>
+              ) : (
+                <View style={styles.hintBox}>
+                  <Text style={styles.hintText}>Je kent het woord niet. Bluf mee!</Text>
+                </View>
               )}
             </View>
           ) : (

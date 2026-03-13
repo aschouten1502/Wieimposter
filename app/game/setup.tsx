@@ -21,7 +21,7 @@ export default function SetupScreen() {
   const [playerNames, setPlayerNames] = useState<string[]>(
     Array.from({ length: defaultPlayerCount }, (_, i) => `Speler ${i + 1}`)
   );
-  const [selectedCategory, setSelectedCategory] = useState<string>('eten');
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(['eten']);
   const [impostersCount, setImpostersCount] = useState(1);
   const [trollMode, setTrollMode] = useState(false);
 
@@ -47,6 +47,16 @@ export default function SetupScreen() {
     });
   }, []);
 
+  const toggleCategory = useCallback((id: string) => {
+    setSelectedCategories((prev) => {
+      if (prev.includes(id)) {
+        if (prev.length === 1) return prev;
+        return prev.filter((c) => c !== id);
+      }
+      return [...prev, id];
+    });
+  }, []);
+
   const handleStart = () => {
     const names = playerNames.map((n, i) => n.trim() || `Speler ${i + 1}`);
 
@@ -62,9 +72,14 @@ export default function SetupScreen() {
       return finalName;
     });
 
-    initGame(uniqueNames, selectedCategory, impostersCount, trollMode);
+    initGame(uniqueNames, selectedCategories, impostersCount, trollMode);
     router.replace('/game/pass');
   };
+
+  const totalWords = selectedCategories.reduce((sum, id) => {
+    const cat = categories.find((c) => c.id === id);
+    return sum + (cat?.words.length ?? 0);
+  }, 0);
 
   return (
     <ScreenContainer>
@@ -89,14 +104,19 @@ export default function SetupScreen() {
           />
         ))}
 
-        <Text style={styles.sectionLabel}>Categorie</Text>
+        <View style={styles.categoryHeader}>
+          <Text style={styles.sectionLabel}>Categorieën</Text>
+          <Text style={styles.categoryCount}>
+            {selectedCategories.length} geselecteerd · {totalWords} woorden
+          </Text>
+        </View>
         <View style={styles.categoryGrid}>
           {categories.map((cat) => (
             <View key={cat.id} style={styles.categoryItem}>
               <CategoryCard
                 category={cat}
-                selected={selectedCategory === cat.id}
-                onPress={setSelectedCategory}
+                selected={selectedCategories.includes(cat.id)}
+                onPress={toggleCategory}
               />
             </View>
           ))}
@@ -147,6 +167,18 @@ const styles = StyleSheet.create({
   sectionLabel: {
     color: Colors.textSecondary,
     fontSize: FontSize.md,
+    fontWeight: '600',
+    marginBottom: Spacing.sm,
+    marginTop: Spacing.md,
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+  },
+  categoryCount: {
+    color: Colors.textMuted,
+    fontSize: FontSize.xs,
     fontWeight: '600',
     marginBottom: Spacing.sm,
     marginTop: Spacing.md,

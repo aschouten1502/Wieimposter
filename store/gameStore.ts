@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { Player, GamePhase, Round, RoundResult, Role } from '@/types/game';
-import { getRandomWord } from '@/data/categories';
+import { getRandomWordFromCategories } from '@/data/categories';
 import { generateId, shuffleArray } from '@/utils/helpers';
 
 interface GameStore {
@@ -10,7 +10,7 @@ interface GameStore {
 
   // Setup
   setPlayers: (players: Player[]) => void;
-  initGame: (playerNames: string[], categoryId: string, impostersCount: number, trollMode: boolean) => void;
+  initGame: (playerNames: string[], categoryIds: string[], impostersCount: number, trollMode: boolean) => void;
 
   // Phase management
   setPhase: (phase: GamePhase) => void;
@@ -40,9 +40,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setPlayers: (players) => set({ players }),
 
-  initGame: (playerNames, categoryId, impostersCount, trollMode) => {
+  initGame: (playerNames, categoryIds, impostersCount, trollMode) => {
     const { usedWords } = get();
-    const secretWord = getRandomWord(categoryId, usedWords);
+    const result = getRandomWordFromCategories(categoryIds, usedWords);
 
     // Troll mode: 15% chance everyone becomes imposter
     const isTrollRound = trollMode && Math.random() < 0.15;
@@ -61,13 +61,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     let imposterIds: string[];
 
     if (isTrollRound) {
-      // Everyone is imposter — nobody knows the word
       imposterIds = players.map((p) => p.id);
       players.forEach((_, idx) => {
         players[idx] = { ...players[idx], role: 'imposter' };
       });
     } else {
-      // Normal: shuffle and assign imposters
       const shuffledIndices = shuffleArray(players.map((_, i) => i));
       const imposterIndices = shuffledIndices.slice(0, safeImposters);
       imposterIds = [];
@@ -78,12 +76,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
       });
     }
 
-    // Randomize play order
     const shuffledPlayers = shuffleArray(players);
 
     const round: Round = {
-      categoryId,
-      secretWord,
+      categoryIds,
+      sourceCategoryId: result.categoryId,
+      secretWord: result.word,
       imposterIds,
       currentPlayerIndex: 0,
       phase: 'passing',
@@ -96,11 +94,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
     set({
       players: shuffledPlayers,
       round,
-      usedWords: [...usedWords, secretWord],
+      usedWords: [...usedWords, result.word],
     });
   },
 
-  // Bug #2 fix: setPhase no longer silently resets currentPlayerIndex
   setPhase: (phase) => {
     const { round } = get();
     if (!round) return;
@@ -131,7 +128,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
     return get().players.every((p) => p.hasRevealed);
   },
 
-  // Bug #8 fix: revoke civilian points when imposter guesses correctly
   imposterFinalGuess: (word) => {
     const { round, players } = get();
     if (!round) return false;
@@ -143,7 +139,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
         if (p.role === 'imposter') {
           return { ...p, score: p.score + 3 };
         }
-        // Revoke civilian win bonus
         if (p.role === 'civilian' && round.roundResult === 'civilians_win') {
           return { ...p, score: p.score - 1 };
         }
@@ -163,19 +158,16 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { players, round, usedWords } = get();
     if (!round) return;
 
-    const secretWord = getRandomWord(round.categoryId, usedWords);
+    const result = getRandomWordFromCategories(round.categoryIds, usedWords);
 
-    // Troll mode: 15% chance if troll mode was enabled by user
     const isTrollRound = round.trollModeEnabled && Math.random() < 0.15;
 
-    // Reset player states but keep scores — create fresh objects
     const resetPlayers: Player[] = players.map((p) => ({
       ...p,
       role: 'civilian' as Role,
       hasRevealed: false,
     }));
 
-    // Shuffle play order
     const shuffled = shuffleArray(resetPlayers);
 
     let imposterIds: string[];
@@ -185,9 +177,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       imposterIds = shuffled.map((p) => p.id);
       finalPlayers = shuffled.map((p) => ({ ...p, role: 'imposter' as Role }));
     } else {
-      // Normal: assign imposters
       const shuffledIndices = shuffleArray(shuffled.map((_, i) => i));
-      // Use original imposter count (not troll count)
       const imposterCount = round.trollRound
         ? Math.max(1, Math.floor(shuffled.length / 3))
         : round.imposterIds.length;
@@ -207,7 +197,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       players: finalPlayers,
       round: {
         ...round,
-        secretWord,
+        categoryIds: round.categoryIds,
+        sourceCategoryId: result.categoryId,
+        secretWord: result.word,
         imposterIds,
         currentPlayerIndex: 0,
         phase: 'passing',
@@ -216,7 +208,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         trollModeEnabled: round.trollModeEnabled,
         trollRound: isTrollRound,
       },
-      usedWords: [...usedWords, secretWord],
+      usedWords: [...usedWords, result.word],
     });
   },
 
