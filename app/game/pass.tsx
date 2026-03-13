@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { Colors, Spacing, FontSize } from '@/constants/theme';
@@ -25,24 +26,31 @@ export default function PassScreen() {
   return (
     <ScreenContainer centered>
       <View style={styles.content}>
-        <Text style={styles.instruction}>Geef de telefoon aan</Text>
-        <Text style={[styles.playerName, { color }]} adjustsFontSizeToFit numberOfLines={1}>{currentPlayer.name}</Text>
-        <Text style={styles.warning}>Zorg dat niemand meekijkt!</Text>
+        <Animated.Text entering={FadeIn.duration(300)} style={styles.instruction}>Geef de telefoon aan</Animated.Text>
+        <Animated.Text
+          entering={FadeInDown.duration(500).delay(150)}
+          style={[styles.playerName, { color }]}
+          adjustsFontSizeToFit
+          numberOfLines={1}
+        >
+          {currentPlayer.name}
+        </Animated.Text>
+        <Animated.Text entering={FadeIn.duration(400).delay(400)} style={styles.warning}>Zorg dat niemand meekijkt!</Animated.Text>
 
-        <View style={styles.progress}>
+        <Animated.View entering={FadeIn.duration(300).delay(500)} style={styles.progress}>
           <Text style={styles.progressText}>
             Speler {round.currentPlayerIndex + 1} van {players.length}
           </Text>
-        </View>
+        </Animated.View>
       </View>
 
-      <View style={styles.buttonContainer}>
+      <Animated.View entering={FadeInUp.duration(400).delay(600)} style={styles.buttonContainer}>
         <Button
           title="IK BEN KLAAR"
           onPress={() => router.replace('/game/reveal')}
           size="lg"
         />
-      </View>
+      </Animated.View>
     </ScreenContainer>
   );
 }

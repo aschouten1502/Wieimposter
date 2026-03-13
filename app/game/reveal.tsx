@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
+import Animated, { FadeIn, FadeInDown, FadeInUp, ZoomIn } from 'react-native-reanimated';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
@@ -60,40 +61,49 @@ export default function RevealScreen() {
 
   return (
     <ScreenContainer centered>
-      <Text style={[styles.playerName, { color }]} adjustsFontSizeToFit numberOfLines={1}>{currentPlayer.name}</Text>
+      <Animated.Text
+        entering={FadeInDown.duration(400)}
+        style={[styles.playerName, { color }]}
+        adjustsFontSizeToFit
+        numberOfLines={1}
+      >
+        {currentPlayer.name}
+      </Animated.Text>
 
       {!revealed ? (
-        <TouchableOpacity
-          style={styles.revealArea}
-          onPress={handleReveal}
-          activeOpacity={0.8}
-        >
-          <Text style={styles.revealIcon}>👁️</Text>
-          <Text style={styles.revealText} adjustsFontSizeToFit numberOfLines={1}>TAP OM JE ROL TE ZIEN</Text>
-          <Text style={styles.revealHint}>Houd je scherm verborgen!</Text>
-        </TouchableOpacity>
+        <Animated.View entering={FadeIn.duration(300)} style={styles.revealAreaWrapper}>
+          <TouchableOpacity
+            style={styles.revealArea}
+            onPress={handleReveal}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.revealIcon}>👁️</Text>
+            <Text style={styles.revealText} adjustsFontSizeToFit numberOfLines={1}>TAP OM JE ROL TE ZIEN</Text>
+            <Text style={styles.revealHint}>Houd je scherm verborgen!</Text>
+          </TouchableOpacity>
+        </Animated.View>
       ) : (
         <View style={styles.roleContainer}>
           {isImposter ? (
             <>
-              <Text style={styles.imposterIcon}>🕵️</Text>
-              <Text style={styles.imposterText}>JIJ BENT DE</Text>
-              <Text style={styles.imposterTitle} adjustsFontSizeToFit numberOfLines={1}>IMPOSTER</Text>
+              <Animated.Text entering={ZoomIn.duration(500).delay(100)} style={styles.imposterIcon}>🕵️</Animated.Text>
+              <Animated.Text entering={FadeInDown.duration(400).delay(300)} style={styles.imposterText}>JIJ BENT DE</Animated.Text>
+              <Animated.Text entering={FadeInDown.duration(500).delay(500)} style={styles.imposterTitle} adjustsFontSizeToFit numberOfLines={1}>IMPOSTER</Animated.Text>
               {isTrollRound ? (
-                <Text style={styles.imposterHint}>Plot twist: iedereen is imposter!</Text>
+                <Animated.Text entering={FadeIn.duration(400).delay(800)} style={styles.imposterHint}>Plot twist: iedereen is imposter!</Animated.Text>
               ) : (
                 <>
-                  <Text style={styles.categoryHint}>Categorie: {categoryName}</Text>
-                  <Text style={styles.imposterHint}>Je kent het woord niet. Bluf mee!</Text>
+                  <Animated.Text entering={FadeIn.duration(400).delay(800)} style={styles.categoryHint}>Categorie: {categoryName}</Animated.Text>
+                  <Animated.Text entering={FadeIn.duration(400).delay(1000)} style={styles.imposterHint}>Je kent het woord niet. Bluf mee!</Animated.Text>
                 </>
               )}
             </>
           ) : (
             <>
-              <Text style={styles.civilianIcon}>✅</Text>
-              <Text style={styles.civilianText}>Je bent een burger</Text>
-              <Text style={styles.secretWord} adjustsFontSizeToFit numberOfLines={1}>{round.secretWord}</Text>
-              <Text style={styles.civilianHint}>Geef subtiele hints zonder het weg te geven</Text>
+              <Animated.Text entering={ZoomIn.duration(500).delay(100)} style={styles.civilianIcon}>✅</Animated.Text>
+              <Animated.Text entering={FadeInDown.duration(400).delay(300)} style={styles.civilianText}>Je bent een burger</Animated.Text>
+              <Animated.Text entering={FadeInDown.duration(500).delay(500)} style={styles.secretWord} adjustsFontSizeToFit numberOfLines={1}>{round.secretWord}</Animated.Text>
+              <Animated.Text entering={FadeIn.duration(400).delay(800)} style={styles.civilianHint}>Geef subtiele hints zonder het weg te geven</Animated.Text>
             </>
           )}
         </View>
@@ -101,11 +111,13 @@ export default function RevealScreen() {
 
       <View style={styles.buttonContainer}>
         {revealed ? (
-          <Button
-            title="VERBERG EN GEEF DOOR"
-            onPress={handleHide}
-            size="lg"
-          />
+          <Animated.View entering={FadeInUp.duration(400).delay(1000)}>
+            <Button
+              title="VERBERG EN GEEF DOOR"
+              onPress={handleHide}
+              size="lg"
+            />
+          </Animated.View>
         ) : (
           <View style={styles.placeholder} />
         )}
@@ -120,6 +132,10 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     letterSpacing: 2,
     marginBottom: Spacing.xl,
+  },
+  revealAreaWrapper: {
+    flex: 1,
+    width: '100%',
   },
   revealArea: {
     flex: 1,

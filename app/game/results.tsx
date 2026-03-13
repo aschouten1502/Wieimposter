@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
+import Animated, { FadeIn, FadeInDown, FadeInUp, ZoomIn } from 'react-native-reanimated';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { PlayerBadge } from '@/components/PlayerBadge';
@@ -93,46 +94,66 @@ export default function ResultsScreen() {
         <View style={styles.resultHeader}>
           {isTrollRound ? (
             <>
-              <Text style={styles.resultEmoji}>🤡</Text>
-              <Text style={[styles.resultTitle, { color: Colors.accent }]} adjustsFontSizeToFit numberOfLines={1}>
+              <Animated.Text entering={ZoomIn.duration(600)} style={styles.resultEmoji}>🤡</Animated.Text>
+              <Animated.Text
+                entering={FadeInDown.duration(500).delay(300)}
+                style={[styles.resultTitle, { color: Colors.accent }]}
+                adjustsFontSizeToFit
+                numberOfLines={1}
+              >
                 TROLL RONDE!
-              </Text>
-              <Text style={styles.trollSubtitle}>
+              </Animated.Text>
+              <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.trollSubtitle}>
                 Iedereen was imposter — niemand kende het woord!
-              </Text>
+              </Animated.Text>
             </>
           ) : imposterGuessed ? (
             <>
-              <Text style={styles.resultEmoji}>🧠</Text>
-              <Text style={[styles.resultTitle, { color: Colors.imposter }]} adjustsFontSizeToFit numberOfLines={1}>
+              <Animated.Text entering={ZoomIn.duration(600)} style={styles.resultEmoji}>🧠</Animated.Text>
+              <Animated.Text
+                entering={FadeInDown.duration(500).delay(300)}
+                style={[styles.resultTitle, { color: Colors.imposter }]}
+                adjustsFontSizeToFit
+                numberOfLines={1}
+              >
                 IMPOSTER RAADT HET!
-              </Text>
+              </Animated.Text>
             </>
           ) : civiliansWon ? (
             <>
-              <Text style={styles.resultEmoji}>🎉</Text>
-              <Text style={[styles.resultTitle, { color: Colors.civilian }]} adjustsFontSizeToFit numberOfLines={1}>
+              <Animated.Text entering={ZoomIn.duration(600)} style={styles.resultEmoji}>🎉</Animated.Text>
+              <Animated.Text
+                entering={FadeInDown.duration(500).delay(300)}
+                style={[styles.resultTitle, { color: Colors.civilian }]}
+                adjustsFontSizeToFit
+                numberOfLines={1}
+              >
                 BURGERS WINNEN!
-              </Text>
+              </Animated.Text>
             </>
           ) : (
             <>
-              <Text style={styles.resultEmoji}>🕵️</Text>
-              <Text style={[styles.resultTitle, { color: Colors.imposter }]} adjustsFontSizeToFit numberOfLines={1}>
+              <Animated.Text entering={ZoomIn.duration(600)} style={styles.resultEmoji}>🕵️</Animated.Text>
+              <Animated.Text
+                entering={FadeInDown.duration(500).delay(300)}
+                style={[styles.resultTitle, { color: Colors.imposter }]}
+                adjustsFontSizeToFit
+                numberOfLines={1}
+              >
                 IMPOSTER WINT!
-              </Text>
+              </Animated.Text>
             </>
           )}
         </View>
 
         {/* Secret Word */}
-        <View style={styles.wordCard}>
+        <Animated.View entering={FadeInUp.duration(500).delay(600)} style={styles.wordCard}>
           <Text style={styles.wordLabel}>Het geheime woord was:</Text>
           <Text style={styles.wordValue} adjustsFontSizeToFit numberOfLines={1}>{round.secretWord}</Text>
-        </View>
+        </Animated.View>
 
         {/* Imposter Reveal */}
-        <View style={styles.section}>
+        <Animated.View entering={FadeInUp.duration(400).delay(800)} style={styles.section}>
           <Text style={styles.sectionTitle}>De Imposter{imposters.length > 1 ? 's' : ''}</Text>
           {imposters.map((imp) => {
             const index = players.findIndex((p) => p.id === imp.id);
@@ -146,11 +167,11 @@ export default function ResultsScreen() {
               />
             );
           })}
-        </View>
+        </Animated.View>
 
         {/* Voted Out */}
         {votedPlayer && !isTrollRound && (
-          <View style={styles.section}>
+          <Animated.View entering={FadeInUp.duration(400).delay(1000)} style={styles.section}>
             <Text style={styles.sectionTitle}>Uitgestemd</Text>
             <PlayerBadge
               name={votedPlayer.name}
@@ -158,21 +179,23 @@ export default function ResultsScreen() {
               isImposter={round.imposterIds.includes(votedPlayer.id)}
               showRole={true}
             />
-          </View>
+          </Animated.View>
         )}
 
         {/* Final Guess (only if civilians won) */}
         {civiliansWon && guessResult === null && !showFinalGuess && (
-          <Button
-            title="IMPOSTER MAG RADEN"
-            onPress={() => setShowFinalGuess(true)}
-            variant="secondary"
-            size="md"
-          />
+          <Animated.View entering={FadeIn.duration(400).delay(1200)}>
+            <Button
+              title="IMPOSTER MAG RADEN"
+              onPress={() => setShowFinalGuess(true)}
+              variant="secondary"
+              size="md"
+            />
+          </Animated.View>
         )}
 
         {showFinalGuess && guessResult === null && (
-          <View style={styles.guessContainer}>
+          <Animated.View entering={FadeIn.duration(300)} style={styles.guessContainer}>
             <Text style={styles.guessLabel}>Imposter, raad het woord:</Text>
             <TextInput
               style={styles.guessInput}
@@ -189,19 +212,19 @@ export default function ResultsScreen() {
               disabled={!guessText.trim()}
               size="md"
             />
-          </View>
+          </Animated.View>
         )}
 
         {guessResult !== null && (
-          <View style={styles.guessResultContainer}>
+          <Animated.View entering={ZoomIn.duration(400)} style={styles.guessResultContainer}>
             <Text style={[styles.guessResultText, guessResult ? styles.guessCorrect : styles.guessWrong]}>
               {guessResult ? 'CORRECT! Imposter wint alsnog!' : 'FOUT! Het was niet het juiste woord.'}
             </Text>
-          </View>
+          </Animated.View>
         )}
 
         {/* Scores */}
-        <View style={styles.section}>
+        <Animated.View entering={FadeInUp.duration(400).delay(1200)} style={styles.section}>
           <Text style={styles.sectionTitle}>Scores</Text>
           {[...players].sort((a, b) => b.score - a.score).map((player) => {
             const index = players.findIndex((p) => p.id === player.id);
@@ -213,10 +236,10 @@ export default function ResultsScreen() {
               </View>
             );
           })}
-        </View>
+        </Animated.View>
 
         {/* Actions */}
-        <View style={styles.actions}>
+        <Animated.View entering={FadeInUp.duration(400).delay(1400)} style={styles.actions}>
           <Button title="VOLGENDE RONDE" onPress={handleNextRound} size="lg" />
           <Button
             title="NIEUW SPEL"
@@ -224,7 +247,7 @@ export default function ResultsScreen() {
             variant="secondary"
             size="md"
           />
-        </View>
+        </Animated.View>
       </ScrollView>
     </ScreenContainer>
   );
