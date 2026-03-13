@@ -1,7 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
-import Animated, { FadeIn, FadeInDown, FadeInUp, ZoomIn } from 'react-native-reanimated';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  interpolate,
+  Easing,
+  FadeInUp,
+  FadeIn,
+} from 'react-native-reanimated';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
@@ -14,6 +22,8 @@ export default function RevealScreen() {
   const router = useRouter();
   const haptics = useHaptics();
   const [revealed, setRevealed] = useState(false);
+  const [showBack, setShowBack] = useState(false);
+  const flipProgress = useSharedValue(0);
 
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
@@ -37,8 +47,36 @@ export default function RevealScreen() {
   const color = PLAYER_COLORS[playerIndex % PLAYER_COLORS.length];
   const isLastPlayer = round.currentPlayerIndex >= players.length - 1;
 
+  const frontStyle = useAnimatedStyle(() => {
+    const rotateY = interpolate(flipProgress.value, [0, 1], [0, 180]);
+    return {
+      transform: [{ perspective: 1000 }, { rotateY: `${rotateY}deg` }],
+      backfaceVisibility: 'hidden' as const,
+      opacity: flipProgress.value > 0.5 ? 0 : 1,
+    };
+  });
+
+  const backStyle = useAnimatedStyle(() => {
+    const rotateY = interpolate(flipProgress.value, [0, 1], [180, 360]);
+    return {
+      transform: [{ perspective: 1000 }, { rotateY: `${rotateY}deg` }],
+      backfaceVisibility: 'hidden' as const,
+      opacity: flipProgress.value > 0.5 ? 1 : 0,
+    };
+  });
+
   const handleReveal = () => {
+    if (revealed) return;
     setRevealed(true);
+
+    // Show back content right before it becomes visible
+    setTimeout(() => setShowBack(true), 250);
+
+    flipProgress.value = withTiming(1, {
+      duration: 600,
+      easing: Easing.out(Easing.cubic),
+    });
+
     if (isImposter) {
       haptics.error();
     } else {
@@ -62,7 +100,7 @@ export default function RevealScreen() {
   return (
     <ScreenContainer centered>
       <Animated.Text
-        entering={FadeInDown.duration(400)}
+        entering={FadeIn.duration(400)}
         style={[styles.playerName, { color }]}
         adjustsFontSizeToFit
         numberOfLines={1}
@@ -70,48 +108,46 @@ export default function RevealScreen() {
         {currentPlayer.name}
       </Animated.Text>
 
-      {!revealed ? (
-        <Animated.View entering={FadeIn.duration(300)} style={styles.revealAreaWrapper}>
-          <TouchableOpacity
-            style={styles.revealArea}
-            onPress={handleReveal}
-            activeOpacity={0.8}
-          >
-            <Text style={styles.revealIcon}>👁️</Text>
-            <Text style={styles.revealText} adjustsFontSizeToFit numberOfLines={1}>TAP OM JE ROL TE ZIEN</Text>
-            <Text style={styles.revealHint}>Houd je scherm verborgen!</Text>
-          </TouchableOpacity>
+      <Pressable style={styles.cardWrapper} onPress={handleReveal} disabled={revealed}>
+        {/* Front of card */}
+        <Animated.View style={[styles.card, styles.cardFront, frontStyle]}>
+          <Text style={styles.revealIcon}>🃏</Text>
+          <Text style={styles.revealText} adjustsFontSizeToFit numberOfLines={1}>TAP OM TE DRAAIEN</Text>
+          <Text style={styles.revealHint}>Houd je scherm verborgen!</Text>
         </Animated.View>
-      ) : (
-        <View style={styles.roleContainer}>
-          {isImposter ? (
-            <>
-              <Animated.Text entering={ZoomIn.duration(500).delay(100)} style={styles.imposterIcon}>🕵️</Animated.Text>
-              <Animated.Text entering={FadeInDown.duration(400).delay(300)} style={styles.imposterText}>JIJ BENT DE</Animated.Text>
-              <Animated.Text entering={FadeInDown.duration(500).delay(500)} style={styles.imposterTitle} adjustsFontSizeToFit numberOfLines={1}>IMPOSTER</Animated.Text>
-              {isTrollRound ? (
-                <Animated.Text entering={FadeIn.duration(400).delay(800)} style={styles.imposterHint}>Plot twist: iedereen is imposter!</Animated.Text>
-              ) : (
-                <>
-                  <Animated.Text entering={FadeIn.duration(400).delay(800)} style={styles.categoryHint}>Categorie: {categoryName}</Animated.Text>
-                  <Animated.Text entering={FadeIn.duration(400).delay(1000)} style={styles.imposterHint}>Je kent het woord niet. Bluf mee!</Animated.Text>
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <Animated.Text entering={ZoomIn.duration(500).delay(100)} style={styles.civilianIcon}>✅</Animated.Text>
-              <Animated.Text entering={FadeInDown.duration(400).delay(300)} style={styles.civilianText}>Je bent een burger</Animated.Text>
-              <Animated.Text entering={FadeInDown.duration(500).delay(500)} style={styles.secretWord} adjustsFontSizeToFit numberOfLines={1}>{round.secretWord}</Animated.Text>
-              <Animated.Text entering={FadeIn.duration(400).delay(800)} style={styles.civilianHint}>Geef subtiele hints zonder het weg te geven</Animated.Text>
-            </>
+
+        {/* Back of card */}
+        <Animated.View style={[styles.card, styles.cardBack, backStyle]}>
+          {showBack && (
+            isImposter ? (
+              <View style={styles.roleContent}>
+                <Text style={styles.imposterIcon}>🕵️</Text>
+                <Text style={styles.imposterText}>JIJ BENT DE</Text>
+                <Text style={styles.imposterTitle} adjustsFontSizeToFit numberOfLines={1}>IMPOSTER</Text>
+                {isTrollRound ? (
+                  <Text style={styles.imposterHint}>Plot twist: iedereen is imposter!</Text>
+                ) : (
+                  <>
+                    <Text style={styles.categoryHint}>Categorie: {categoryName}</Text>
+                    <Text style={styles.imposterHint}>Je kent het woord niet. Bluf mee!</Text>
+                  </>
+                )}
+              </View>
+            ) : (
+              <View style={styles.roleContent}>
+                <Text style={styles.civilianIcon}>✅</Text>
+                <Text style={styles.civilianText}>Je bent een burger</Text>
+                <Text style={styles.secretWord} adjustsFontSizeToFit numberOfLines={1}>{round.secretWord}</Text>
+                <Text style={styles.civilianHint}>Geef subtiele hints zonder het weg te geven</Text>
+              </View>
+            )
           )}
-        </View>
-      )}
+        </Animated.View>
+      </Pressable>
 
       <View style={styles.buttonContainer}>
         {revealed ? (
-          <Animated.View entering={FadeInUp.duration(400).delay(1000)}>
+          <Animated.View entering={FadeInUp.duration(400).delay(800)}>
             <Button
               title="VERBERG EN GEEF DOOR"
               onPress={handleHide}
@@ -133,24 +169,34 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     marginBottom: Spacing.xl,
   },
-  revealAreaWrapper: {
+  cardWrapper: {
     flex: 1,
     width: '100%',
   },
-  revealArea: {
-    flex: 1,
+  card: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    borderRadius: BorderRadius.xl,
     justifyContent: 'center',
     alignItems: 'center',
+    padding: Spacing.lg,
+  },
+  cardFront: {
     backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.xl,
-    width: '100%',
     borderWidth: 2,
     borderColor: Colors.border,
-    borderStyle: 'dashed',
+  },
+  cardBack: {
+    backgroundColor: Colors.surface,
+    borderWidth: 2,
+    borderColor: Colors.surfaceLight,
   },
   revealIcon: {
-    fontSize: 64,
-    marginBottom: Spacing.md,
+    fontSize: 72,
+    marginBottom: Spacing.lg,
   },
   revealText: {
     color: Colors.text,
@@ -163,11 +209,9 @@ const styles = StyleSheet.create({
     fontSize: FontSize.sm,
     marginTop: Spacing.sm,
   },
-  roleContainer: {
-    flex: 1,
-    justifyContent: 'center',
+  roleContent: {
     alignItems: 'center',
-    width: '100%',
+    justifyContent: 'center',
   },
   imposterIcon: {
     fontSize: 80,
