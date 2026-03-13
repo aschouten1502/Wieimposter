@@ -42,6 +42,7 @@ export interface Round {
   currentPlayerIndex: number;
   phase: GamePhase;
   roundResult: RoundResult | null;
+  trollRound?: boolean;
 }
 
 export interface VoteResult {

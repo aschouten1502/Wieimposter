@@ -10,7 +10,7 @@ interface GameStore {
 
   // Setup
   setPlayers: (players: Player[]) => void;
-  initGame: (playerNames: string[], categoryId: string, impostersCount: number, timerEnabled: boolean) => void;
+  initGame: (playerNames: string[], categoryId: string, impostersCount: number, trollMode: boolean) => void;
 
   // Phase management
   setPhase: (phase: GamePhase) => void;
@@ -40,9 +40,12 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setPlayers: (players) => set({ players }),
 
-  initGame: (playerNames, categoryId, impostersCount, timerEnabled) => {
+  initGame: (playerNames, categoryId, impostersCount, trollMode) => {
     const { usedWords } = get();
     const secretWord = getRandomWord(categoryId, usedWords);
+
+    // Troll mode: 15% chance everyone becomes imposter
+    const isTrollRound = trollMode && Math.random() < 0.15;
 
     // Cap imposters to safe maximum
     const safeImposters = Math.min(impostersCount, Math.max(1, Math.floor(playerNames.length / 3)));
@@ -58,15 +61,25 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hasGivenHint: false,
     }));
 
-    // Shuffle and assign imposters
-    const shuffledIndices = shuffleArray(players.map((_, i) => i));
-    const imposterIndices = shuffledIndices.slice(0, safeImposters);
-    const imposterIds: string[] = [];
+    let imposterIds: string[];
 
-    imposterIndices.forEach((idx) => {
-      players[idx] = { ...players[idx], role: 'imposter' };
-      imposterIds.push(players[idx].id);
-    });
+    if (isTrollRound) {
+      // Everyone is imposter — nobody knows the word
+      imposterIds = players.map((p) => p.id);
+      players.forEach((_, idx) => {
+        players[idx] = { ...players[idx], role: 'imposter' };
+      });
+    } else {
+      // Normal: shuffle and assign imposters
+      const shuffledIndices = shuffleArray(players.map((_, i) => i));
+      const imposterIndices = shuffledIndices.slice(0, safeImposters);
+      imposterIds = [];
+
+      imposterIndices.forEach((idx) => {
+        players[idx] = { ...players[idx], role: 'imposter' };
+        imposterIds.push(players[idx].id);
+      });
+    }
 
     // Randomize play order
     const shuffledPlayers = shuffleArray(players);
@@ -78,6 +91,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       currentPlayerIndex: 0,
       phase: 'passing',
       roundResult: null,
+      trollRound: isTrollRound,
     };
 
     set({
@@ -152,6 +166,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const secretWord = getRandomWord(round.categoryId, usedWords);
 
+    // Troll mode: 15% chance if previous round had troll mode enabled
+    const wasTrollEnabled = round.trollRound !== undefined;
+    const isTrollRound = wasTrollEnabled && Math.random() < 0.15;
+
     // Reset player states but keep scores — create fresh objects
     const resetPlayers: Player[] = players.map((p) => ({
       ...p,
@@ -165,19 +183,30 @@ export const useGameStore = create<GameStore>((set, get) => ({
     // Shuffle play order
     const shuffled = shuffleArray(resetPlayers);
 
-    // Assign new imposters immutably
-    const shuffledIndices = shuffleArray(shuffled.map((_, i) => i));
-    const imposterCount = round.imposterIds.length;
-    const imposterIndices = shuffledIndices.slice(0, imposterCount);
-    const imposterIds: string[] = [];
+    let imposterIds: string[];
+    let finalPlayers: Player[];
 
-    const finalPlayers = shuffled.map((p, idx) => {
-      if (imposterIndices.includes(idx)) {
-        imposterIds.push(p.id);
-        return { ...p, role: 'imposter' as Role };
-      }
-      return p;
-    });
+    if (isTrollRound) {
+      imposterIds = shuffled.map((p) => p.id);
+      finalPlayers = shuffled.map((p) => ({ ...p, role: 'imposter' as Role }));
+    } else {
+      // Normal: assign imposters
+      const shuffledIndices = shuffleArray(shuffled.map((_, i) => i));
+      // Use original imposter count (not troll count)
+      const imposterCount = round.trollRound
+        ? Math.max(1, Math.floor(shuffled.length / 3))
+        : round.imposterIds.length;
+      const imposterIndices = shuffledIndices.slice(0, Math.min(imposterCount, Math.max(1, Math.floor(shuffled.length / 3))));
+      imposterIds = [];
+
+      finalPlayers = shuffled.map((p, idx) => {
+        if (imposterIndices.includes(idx)) {
+          imposterIds.push(p.id);
+          return { ...p, role: 'imposter' as Role };
+        }
+        return p;
+      });
+    }
 
     set({
       players: finalPlayers,
@@ -188,6 +217,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
         currentPlayerIndex: 0,
         phase: 'passing',
         roundResult: null,
+        trollRound: isTrollRound,
       },
       usedWords: [...usedWords, secretWord],
     });

@@ -6,7 +6,7 @@ import { Button } from '@/components/Button';
 import { Stepper } from '@/components/Stepper';
 import { PlayerInput } from '@/components/PlayerInput';
 import { CategoryCard } from '@/components/CategoryCard';
-import { Colors, Spacing, FontSize } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
 import { MIN_PLAYERS, MAX_PLAYERS } from '@/constants/config';
 import { categories } from '@/data/categories';
 import { useGameStore } from '@/store/gameStore';
@@ -23,6 +23,7 @@ export default function SetupScreen() {
   );
   const [selectedCategory, setSelectedCategory] = useState<string>('eten');
   const [impostersCount, setImpostersCount] = useState(1);
+  const [trollMode, setTrollMode] = useState(false);
 
   const handlePlayerCountChange = useCallback((count: number) => {
     setPlayerCount(count);
@@ -63,7 +64,7 @@ export default function SetupScreen() {
       return finalName;
     });
 
-    initGame(uniqueNames, selectedCategory, impostersCount, false);
+    initGame(uniqueNames, selectedCategory, impostersCount, trollMode);
     router.replace('/game/pass');
   };
 
@@ -111,6 +112,21 @@ export default function SetupScreen() {
           onChange={setImpostersCount}
         />
 
+        <View style={styles.trollRow}>
+          <View style={styles.trollInfo}>
+            <Text style={styles.trollLabel}>Troll Modus</Text>
+            <Text style={styles.trollDesc}>Kans dat iedereen imposter is</Text>
+          </View>
+          <Button
+            title={trollMode ? 'AAN' : 'UIT'}
+            onPress={() => setTrollMode(!trollMode)}
+            variant={trollMode ? 'primary' : 'secondary'}
+            size="sm"
+            fullWidth={false}
+            style={styles.trollButton}
+          />
+        </View>
+
         <View style={styles.startButton}>
           <Button title="START SPEL" onPress={handleStart} size="lg" />
         </View>
@@ -145,6 +161,31 @@ const styles = StyleSheet.create({
   },
   categoryItem: {
     width: '48%',
+  },
+  trollRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: Colors.surface,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    marginTop: Spacing.md,
+  },
+  trollInfo: {
+    flex: 1,
+  },
+  trollLabel: {
+    color: Colors.text,
+    fontSize: FontSize.lg,
+    fontWeight: '600',
+  },
+  trollDesc: {
+    color: Colors.textMuted,
+    fontSize: FontSize.xs,
+    marginTop: 2,
+  },
+  trollButton: {
+    width: 80,
   },
   startButton: {
     marginTop: Spacing.xl,

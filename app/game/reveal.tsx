@@ -7,6 +7,7 @@ import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { PLAYER_COLORS } from '@/constants/config';
+import { getCategoryById } from '@/data/categories';
 
 export default function RevealScreen() {
   const router = useRouter();
@@ -28,6 +29,9 @@ export default function RevealScreen() {
   }
 
   const isImposter = round.imposterIds.includes(currentPlayer.id);
+  const isTrollRound = round.trollRound === true;
+  const category = getCategoryById(round.categoryId);
+  const categoryName = category?.name ?? '';
   const playerIndex = players.findIndex((p) => p.id === currentPlayer.id);
   const color = PLAYER_COLORS[playerIndex % PLAYER_COLORS.length];
   const isLastPlayer = round.currentPlayerIndex >= players.length - 1;
@@ -75,7 +79,14 @@ export default function RevealScreen() {
               <Text style={styles.imposterIcon}>🕵️</Text>
               <Text style={styles.imposterText}>JIJ BENT DE</Text>
               <Text style={styles.imposterTitle}>IMPOSTER</Text>
-              <Text style={styles.imposterHint}>Je kent het woord niet. Bluf mee!</Text>
+              {isTrollRound ? (
+                <Text style={styles.imposterHint}>Plot twist: iedereen is imposter!</Text>
+              ) : (
+                <>
+                  <Text style={styles.categoryHint}>Categorie: {categoryName}</Text>
+                  <Text style={styles.imposterHint}>Je kent het woord niet. Bluf mee!</Text>
+                </>
+              )}
             </>
           ) : (
             <>
@@ -157,10 +168,17 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 4,
   },
+  categoryHint: {
+    color: Colors.accent,
+    fontSize: FontSize.lg,
+    fontWeight: '700',
+    marginTop: Spacing.lg,
+    textAlign: 'center',
+  },
   imposterHint: {
     color: Colors.textMuted,
     fontSize: FontSize.md,
-    marginTop: Spacing.lg,
+    marginTop: Spacing.sm,
     textAlign: 'center',
   },
   civilianIcon: {
