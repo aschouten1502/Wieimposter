@@ -60,7 +60,7 @@ export default function RevealScreen() {
 
   return (
     <ScreenContainer centered>
-      <Text style={[styles.playerName, { color }]}>{currentPlayer.name}</Text>
+      <Text style={[styles.playerName, { color }]} adjustsFontSizeToFit numberOfLines={1}>{currentPlayer.name}</Text>
 
       {!revealed ? (
         <TouchableOpacity
@@ -69,7 +69,7 @@ export default function RevealScreen() {
           activeOpacity={0.8}
         >
           <Text style={styles.revealIcon}>👁️</Text>
-          <Text style={styles.revealText}>TAP OM JE ROL TE ZIEN</Text>
+          <Text style={styles.revealText} adjustsFontSizeToFit numberOfLines={1}>TAP OM JE ROL TE ZIEN</Text>
           <Text style={styles.revealHint}>Houd je scherm verborgen!</Text>
         </TouchableOpacity>
       ) : (
@@ -78,7 +78,7 @@ export default function RevealScreen() {
             <>
               <Text style={styles.imposterIcon}>🕵️</Text>
               <Text style={styles.imposterText}>JIJ BENT DE</Text>
-              <Text style={styles.imposterTitle}>IMPOSTER</Text>
+              <Text style={styles.imposterTitle} adjustsFontSizeToFit numberOfLines={1}>IMPOSTER</Text>
               {isTrollRound ? (
                 <Text style={styles.imposterHint}>Plot twist: iedereen is imposter!</Text>
               ) : (
@@ -92,7 +92,7 @@ export default function RevealScreen() {
             <>
               <Text style={styles.civilianIcon}>✅</Text>
               <Text style={styles.civilianText}>Je bent een burger</Text>
-              <Text style={styles.secretWord}>{round.secretWord}</Text>
+              <Text style={styles.secretWord} adjustsFontSizeToFit numberOfLines={1}>{round.secretWord}</Text>
               <Text style={styles.civilianHint}>Geef subtiele hints zonder het weg te geven</Text>
             </>
           )}
@@ -102,7 +102,7 @@ export default function RevealScreen() {
       <View style={styles.buttonContainer}>
         {revealed ? (
           <Button
-            title="VERBERG & GEEF DOOR"
+            title="VERBERG EN GEEF DOOR"
             onPress={handleHide}
             size="lg"
           />

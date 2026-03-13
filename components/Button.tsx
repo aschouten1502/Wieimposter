@@ -61,7 +61,12 @@ export function Button({
       {loading ? (
         <ActivityIndicator color={Colors.text} />
       ) : (
-        <Text style={[styles.text, styles[`text_${variant}`], styles[`text_${size}`], textStyle]}>
+        <Text
+          style={[styles.text, styles[`text_${variant}`], styles[`text_${size}`], textStyle]}
+          numberOfLines={1}
+          adjustsFontSizeToFit
+          minimumFontScale={0.7}
+        >
           {title}
         </Text>
       )}

@@ -25,7 +25,7 @@ export function CategoryCard({ category, selected, onPress }: CategoryCardProps)
       style={[styles.card, selected && styles.cardSelected]}
     >
       <Text style={styles.icon}>{category.icon}</Text>
-      <Text style={styles.name}>{category.name}</Text>
+      <Text style={styles.name} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{category.name}</Text>
       <Text style={styles.count}>{category.words.length} woorden</Text>
     </TouchableOpacity>
   );

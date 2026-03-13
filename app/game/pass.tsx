@@ -26,7 +26,7 @@ export default function PassScreen() {
     <ScreenContainer centered>
       <View style={styles.content}>
         <Text style={styles.instruction}>Geef de telefoon aan</Text>
-        <Text style={[styles.playerName, { color }]}>{currentPlayer.name}</Text>
+        <Text style={[styles.playerName, { color }]} adjustsFontSizeToFit numberOfLines={1}>{currentPlayer.name}</Text>
         <Text style={styles.warning}>Zorg dat niemand meekijkt!</Text>
 
         <View style={styles.progress}>
@@ -64,6 +64,8 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 2,
     textAlign: 'center',
+    width: '100%',
+    paddingHorizontal: Spacing.md,
   },
   warning: {
     color: Colors.textMuted,

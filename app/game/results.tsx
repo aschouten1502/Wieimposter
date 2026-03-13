@@ -94,7 +94,7 @@ export default function ResultsScreen() {
           {isTrollRound ? (
             <>
               <Text style={styles.resultEmoji}>🤡</Text>
-              <Text style={[styles.resultTitle, { color: Colors.accent }]}>
+              <Text style={[styles.resultTitle, { color: Colors.accent }]} adjustsFontSizeToFit numberOfLines={1}>
                 TROLL RONDE!
               </Text>
               <Text style={styles.trollSubtitle}>
@@ -104,21 +104,21 @@ export default function ResultsScreen() {
           ) : imposterGuessed ? (
             <>
               <Text style={styles.resultEmoji}>🧠</Text>
-              <Text style={[styles.resultTitle, { color: Colors.imposter }]}>
-                IMPOSTER RAADT HET WOORD!
+              <Text style={[styles.resultTitle, { color: Colors.imposter }]} adjustsFontSizeToFit numberOfLines={1}>
+                IMPOSTER RAADT HET!
               </Text>
             </>
           ) : civiliansWon ? (
             <>
               <Text style={styles.resultEmoji}>🎉</Text>
-              <Text style={[styles.resultTitle, { color: Colors.civilian }]}>
+              <Text style={[styles.resultTitle, { color: Colors.civilian }]} adjustsFontSizeToFit numberOfLines={1}>
                 BURGERS WINNEN!
               </Text>
             </>
           ) : (
             <>
               <Text style={styles.resultEmoji}>🕵️</Text>
-              <Text style={[styles.resultTitle, { color: Colors.imposter }]}>
+              <Text style={[styles.resultTitle, { color: Colors.imposter }]} adjustsFontSizeToFit numberOfLines={1}>
                 IMPOSTER WINT!
               </Text>
             </>
@@ -128,7 +128,7 @@ export default function ResultsScreen() {
         {/* Secret Word */}
         <View style={styles.wordCard}>
           <Text style={styles.wordLabel}>Het geheime woord was:</Text>
-          <Text style={styles.wordValue}>{round.secretWord}</Text>
+          <Text style={styles.wordValue} adjustsFontSizeToFit numberOfLines={1}>{round.secretWord}</Text>
         </View>
 
         {/* Imposter Reveal */}

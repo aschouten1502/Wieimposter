@@ -13,7 +13,7 @@ export default function HomeScreen() {
       <View style={styles.logoContainer}>
         <Text style={styles.emoji}>🕵️</Text>
         <Text style={styles.title}>WHO'S THE</Text>
-        <Text style={styles.titleAccent}>IMPOSTER</Text>
+        <Text style={styles.titleAccent} adjustsFontSizeToFit numberOfLines={1}>IMPOSTER</Text>
         <Text style={styles.subtitle}>De ultieme party game</Text>
       </View>
 
@@ -25,7 +25,7 @@ export default function HomeScreen() {
         />
         <View style={styles.buttonRow}>
           <Button
-            title="Hoe te Spelen"
+            title="Uitleg"
             onPress={() => router.push('/how-to-play')}
             variant="secondary"
             size="md"
