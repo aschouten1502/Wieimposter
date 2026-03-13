@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
@@ -15,27 +15,43 @@ export default function ResultsScreen() {
   const [showFinalGuess, setShowFinalGuess] = useState(false);
   const [guessText, setGuessText] = useState('');
   const [guessResult, setGuessResult] = useState<boolean | null>(null);
-  const [statsRecorded, setStatsRecorded] = useState(false);
+  const hapticsTriggered = useRef(false);
 
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
-  const getVoteResults = useGameStore((s) => s.getVoteResults);
-  const getImposters = useGameStore((s) => s.getImposters);
   const imposterFinalGuess = useGameStore((s) => s.imposterFinalGuess);
   const nextRound = useGameStore((s) => s.nextRound);
   const resetGame = useGameStore((s) => s.resetGame);
   const recordGame = useStatsStore((s) => s.recordGame);
 
-  const voteResults = getVoteResults();
-  const imposters = getImposters();
+  // Memoize vote results and imposters to avoid recalculation on every keystroke
+  const voteResults = useMemo(() => {
+    if (!round) return [];
+    const voteCounts: Record<string, number> = {};
+    players.forEach((p) => {
+      if (p.voteTargetId) {
+        voteCounts[p.voteTargetId] = (voteCounts[p.voteTargetId] || 0) + 1;
+      }
+    });
+    return players.map((p) => ({
+      playerId: p.id,
+      playerName: p.name,
+      voteCount: voteCounts[p.id] || 0,
+    })).sort((a, b) => b.voteCount - a.voteCount);
+  }, [players, round]);
 
-  // Record stats on mount (initial result)
+  const imposters = useMemo(() => {
+    if (!round) return [];
+    return players.filter((p) => round.imposterIds.includes(p.id));
+  }, [players, round]);
+
+  // Haptic feedback on mount
   useEffect(() => {
-    if (round?.roundResult && !statsRecorded) {
+    if (round?.roundResult && !hapticsTriggered.current) {
       haptics.heavy();
-      setStatsRecorded(true);
+      hapticsTriggered.current = true;
     }
-  }, []);
+  }, [round?.roundResult, haptics]);
 
   if (!round) {
     router.replace('/');

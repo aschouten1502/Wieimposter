@@ -16,15 +16,16 @@ import { getMaxImposters } from '@/utils/helpers';
 export default function SetupScreen() {
   const router = useRouter();
   const initGame = useGameStore((s) => s.initGame);
-  const settings = useSettingsStore();
+  const defaultPlayerCount = useSettingsStore((s) => s.playerCount);
+  const defaultTimerEnabled = useSettingsStore((s) => s.timerEnabled);
 
-  const [playerCount, setPlayerCount] = useState(settings.playerCount);
+  const [playerCount, setPlayerCount] = useState(defaultPlayerCount);
   const [playerNames, setPlayerNames] = useState<string[]>(
-    Array.from({ length: settings.playerCount }, (_, i) => `Speler ${i + 1}`)
+    Array.from({ length: defaultPlayerCount }, (_, i) => `Speler ${i + 1}`)
   );
   const [selectedCategory, setSelectedCategory] = useState<string>('eten');
   const [impostersCount, setImpostersCount] = useState(1);
-  const [timerEnabled, setTimerEnabled] = useState(settings.timerEnabled);
+  const [timerEnabled, setTimerEnabled] = useState(defaultTimerEnabled);
 
   const handlePlayerCountChange = useCallback((count: number) => {
     setPlayerCount(count);

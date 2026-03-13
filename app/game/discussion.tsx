@@ -42,12 +42,7 @@ export default function DiscussionScreen() {
     haptics.medium();
     setCurrentPlayerIndex(0);
     setPhase('voting');
-    if (votingMode === 'secret') {
-      router.replace('/game/vote-pass');
-    } else {
-      // Open voting: go directly to vote screen for first player
-      router.replace('/game/vote-pass');
-    }
+    router.replace('/game/vote-pass');
   };
 
   return (

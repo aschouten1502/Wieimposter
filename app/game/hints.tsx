@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { useRef, useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { TimerDisplay } from '@/components/Timer';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { Colors, Spacing, FontSize } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { useTimer } from '@/hooks/useTimer';
@@ -14,24 +14,45 @@ import { PLAYER_COLORS } from '@/constants/config';
 export default function HintsScreen() {
   const router = useRouter();
   const haptics = useHaptics();
+  const isAdvancing = useRef(false);
 
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
   const markHintGiven = useGameStore((s) => s.markHintGiven);
   const nextPlayer = useGameStore((s) => s.nextPlayer);
   const setPhase = useGameStore((s) => s.setPhase);
-  const setCurrentPlayerIndex = useGameStore((s) => s.setCurrentPlayerIndex);
 
   const timerEnabled = useSettingsStore((s) => s.timerEnabled);
   const hintTimer = useSettingsStore((s) => s.hintTimer);
 
   const currentPlayerIndex = round?.currentPlayerIndex ?? 0;
-  const currentPlayer = players[currentPlayerIndex];
+  const currentPlayer = players[currentPlayerIndex] ?? null;
   const isLastPlayer = currentPlayerIndex >= players.length - 1;
+
+  const handleNext = useCallback(() => {
+    // Guard against timer + button race condition
+    if (isAdvancing.current) return;
+    if (!currentPlayer) return;
+    isAdvancing.current = true;
+
+    haptics.light();
+    markHintGiven(currentPlayer.id);
+
+    if (isLastPlayer) {
+      setPhase('discussion');
+      router.replace('/game/discussion');
+    } else {
+      nextPlayer();
+      restart();
+    }
+
+    // Reset guard after state updates propagate
+    setTimeout(() => { isAdvancing.current = false; }, 100);
+  }, [currentPlayer, isLastPlayer, haptics, markHintGiven, nextPlayer, setPhase, router]);
 
   const { seconds, progress, restart } = useTimer({
     initialSeconds: hintTimer,
-    autoStart: timerEnabled,
+    autoStart: timerEnabled && !!round,
     onExpire: () => {
       haptics.warning();
       handleNext();
@@ -44,19 +65,6 @@ export default function HintsScreen() {
   }
 
   const color = PLAYER_COLORS[currentPlayerIndex % PLAYER_COLORS.length];
-
-  const handleNext = () => {
-    haptics.light();
-    markHintGiven(currentPlayer.id);
-
-    if (isLastPlayer) {
-      setPhase('discussion');
-      router.replace('/game/discussion');
-    } else {
-      nextPlayer();
-      restart();
-    }
-  };
 
   return (
     <ScreenContainer centered>
