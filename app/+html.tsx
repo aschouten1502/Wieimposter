@@ -14,9 +14,26 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <link rel="manifest" href="/manifest.json" />
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: `
-          html, body { height: 100%; background-color: #0A0A1A; }
-          body { overflow: hidden; }
-          #root { display: flex; height: 100%; flex: 1; }
+          html, body {
+            height: 100%;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            background-color: #0A0A1A;
+            margin: 0;
+            padding: 0;
+          }
+          body {
+            overflow: hidden;
+            padding-bottom: env(safe-area-inset-bottom);
+          }
+          #root {
+            display: flex;
+            height: 100%;
+            min-height: 100vh;
+            min-height: -webkit-fill-available;
+            flex: 1;
+            background-color: #0A0A1A;
+          }
         `}} />
       </head>
       <body>

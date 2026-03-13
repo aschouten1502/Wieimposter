@@ -33,6 +33,7 @@ const styles = StyleSheet.create({
   },
   safe: {
     flex: 1,
+    backgroundColor: '#0A0A1A',
   },
   container: {
     flex: 1,
