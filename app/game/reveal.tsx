@@ -13,12 +13,14 @@ export default function RevealScreen() {
   const haptics = useHaptics();
   const [revealed, setRevealed] = useState(false);
 
-  const currentPlayer = useGameStore((s) => s.getCurrentPlayer());
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
+  const currentPlayer = round && round.currentPlayerIndex < players.length
+    ? players[round.currentPlayerIndex] : null;
   const markPlayerRevealed = useGameStore((s) => s.markPlayerRevealed);
   const nextPlayer = useGameStore((s) => s.nextPlayer);
   const setPhase = useGameStore((s) => s.setPhase);
+  const setCurrentPlayerIndex = useGameStore((s) => s.setCurrentPlayerIndex);
 
   if (!currentPlayer || !round) {
     router.replace('/');
@@ -43,6 +45,7 @@ export default function RevealScreen() {
     markPlayerRevealed(currentPlayer.id);
 
     if (isLastPlayer) {
+      setCurrentPlayerIndex(0);
       setPhase('hints');
       router.replace('/game/hints');
     } else {

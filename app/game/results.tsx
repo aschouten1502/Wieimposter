@@ -15,6 +15,7 @@ export default function ResultsScreen() {
   const [showFinalGuess, setShowFinalGuess] = useState(false);
   const [guessText, setGuessText] = useState('');
   const [guessResult, setGuessResult] = useState<boolean | null>(null);
+  const [statsRecorded, setStatsRecorded] = useState(false);
 
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
@@ -28,13 +29,11 @@ export default function ResultsScreen() {
   const voteResults = getVoteResults();
   const imposters = getImposters();
 
+  // Record stats on mount (initial result)
   useEffect(() => {
-    if (round?.roundResult) {
+    if (round?.roundResult && !statsRecorded) {
       haptics.heavy();
-      recordGame(
-        round.roundResult,
-        players.map((p) => ({ name: p.name, role: p.role }))
-      );
+      setStatsRecorded(true);
     }
   }, []);
 
@@ -56,14 +55,29 @@ export default function ResultsScreen() {
     }
   };
 
+  // Record stats when leaving (captures final guess result too)
+  const recordAndProceed = (callback: () => void) => {
+    if (round.roundResult) {
+      recordGame(
+        round.roundResult,
+        players.map((p) => ({ name: p.name, role: p.role }))
+      );
+    }
+    callback();
+  };
+
   const handleNextRound = () => {
-    nextRound();
-    router.replace('/game/pass');
+    recordAndProceed(() => {
+      nextRound();
+      router.replace('/game/pass');
+    });
   };
 
   const handleNewGame = () => {
-    resetGame();
-    router.replace('/game/setup');
+    recordAndProceed(() => {
+      resetGame();
+      router.replace('/game/setup');
+    });
   };
 
   return (

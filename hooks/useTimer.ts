@@ -11,35 +11,66 @@ export function useTimer({ initialSeconds, onExpire, autoStart = false }: UseTim
   const [isRunning, setIsRunning] = useState(autoStart);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const onExpireRef = useRef(onExpire);
+  const hasExpiredRef = useRef(false);
   onExpireRef.current = onExpire;
 
+  const clearTimer = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
+  }, []);
+
   useEffect(() => {
-    if (!isRunning) return;
+    if (!isRunning) {
+      clearTimer();
+      return;
+    }
+
+    hasExpiredRef.current = false;
 
     intervalRef.current = setInterval(() => {
       setSeconds((prev) => {
         if (prev <= 1) {
+          clearTimer();
           setIsRunning(false);
-          onExpireRef.current?.();
+          if (!hasExpiredRef.current) {
+            hasExpiredRef.current = true;
+            onExpireRef.current?.();
+          }
           return 0;
         }
         return prev - 1;
       });
     }, 1000);
 
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, [isRunning]);
+    return clearTimer;
+  }, [isRunning, clearTimer]);
 
-  const start = useCallback(() => setIsRunning(true), []);
+  const start = useCallback(() => {
+    hasExpiredRef.current = false;
+    setIsRunning(true);
+  }, []);
+
   const pause = useCallback(() => setIsRunning(false), []);
+
   const reset = useCallback(() => {
+    clearTimer();
     setIsRunning(false);
+    hasExpiredRef.current = false;
     setSeconds(initialSeconds);
-  }, [initialSeconds]);
+  }, [initialSeconds, clearTimer]);
 
-  const progress = seconds / initialSeconds;
+  // Reset and immediately start (for advancing to next player)
+  const restart = useCallback(() => {
+    clearTimer();
+    hasExpiredRef.current = false;
+    setSeconds(initialSeconds);
+    setIsRunning(true);
+  }, [initialSeconds, clearTimer]);
 
-  return { seconds, isRunning, start, pause, reset, progress };
+  const safeInitial = initialSeconds > 0 ? initialSeconds : 1;
+  const progress = seconds / safeInitial;
+
+  return { seconds, isRunning, start, pause, reset, restart, progress };
 }

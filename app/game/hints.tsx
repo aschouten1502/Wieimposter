@@ -29,7 +29,7 @@ export default function HintsScreen() {
   const currentPlayer = players[currentPlayerIndex];
   const isLastPlayer = currentPlayerIndex >= players.length - 1;
 
-  const { seconds, progress, reset } = useTimer({
+  const { seconds, progress, restart } = useTimer({
     initialSeconds: hintTimer,
     autoStart: timerEnabled,
     onExpire: () => {
@@ -54,7 +54,7 @@ export default function HintsScreen() {
       router.replace('/game/discussion');
     } else {
       nextPlayer();
-      reset();
+      restart();
     }
   };
 

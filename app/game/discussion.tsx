@@ -41,11 +41,11 @@ export default function DiscussionScreen() {
   const handleGoToVote = () => {
     haptics.medium();
     setCurrentPlayerIndex(0);
+    setPhase('voting');
     if (votingMode === 'secret') {
-      setPhase('vote-passing');
       router.replace('/game/vote-pass');
     } else {
-      setPhase('vote-passing');
+      // Open voting: go directly to vote screen for first player
       router.replace('/game/vote-pass');
     }
   };

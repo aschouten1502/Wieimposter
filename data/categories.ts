@@ -210,8 +210,16 @@ export function getCategoryById(id: string): Category | undefined {
 
 export function getRandomWord(categoryId: string, exclude: string[] = []): string {
   const category = getCategoryById(categoryId);
-  if (!category) return '';
+  if (!category || category.words.length === 0) {
+    // Fallback to first available category
+    const fallback = categories.find((c) => c.words.length > 0);
+    if (!fallback) return 'Onbekend';
+    return fallback.words[Math.floor(Math.random() * fallback.words.length)].value;
+  }
   const available = category.words.filter((w) => !exclude.includes(w.value));
-  if (available.length === 0) return category.words[0].value;
+  if (available.length === 0) {
+    // All words used — reset exclusion and pick any word
+    return category.words[Math.floor(Math.random() * category.words.length)].value;
+  }
   return available[Math.floor(Math.random() * available.length)].value;
 }

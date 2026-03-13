@@ -29,10 +29,10 @@ interface GameStore {
   castVote: (voterId: string, targetId: string) => void;
   allVotesCast: () => boolean;
   getVoteResults: () => VoteResult[];
-  getMostVotedPlayerId: () => string | null;
+  getMostVotedPlayerId: () => { playerId: string | null; isTie: boolean };
 
   // Results
-  calculateResults: () => RoundResult;
+  calculateResults: () => void;
   imposterFinalGuess: (word: string) => boolean;
 
   // Game flow
@@ -40,7 +40,6 @@ interface GameStore {
   resetGame: () => void;
 
   // Helpers
-  getCurrentPlayer: () => Player | null;
   getPlayerById: (id: string) => Player | null;
   getImposters: () => Player[];
 }
@@ -56,10 +55,13 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const { usedWords } = get();
     const secretWord = getRandomWord(categoryId, usedWords);
 
-    const players: Player[] = playerNames.map((name, index) => ({
+    // Cap imposters to safe maximum
+    const safeImposters = Math.min(impostersCount, Math.max(1, Math.floor(playerNames.length / 3)));
+
+    const players: Player[] = playerNames.map((name) => ({
       id: generateId(),
       name,
-      role: 'civilian',
+      role: 'civilian' as Role,
       score: 0,
       hasVoted: false,
       voteTargetId: null,
@@ -69,11 +71,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     // Shuffle and assign imposters
     const shuffledIndices = shuffleArray(players.map((_, i) => i));
-    const imposterIndices = shuffledIndices.slice(0, impostersCount);
+    const imposterIndices = shuffledIndices.slice(0, safeImposters);
     const imposterIds: string[] = [];
 
     imposterIndices.forEach((idx) => {
-      players[idx].role = 'imposter';
+      players[idx] = { ...players[idx], role: 'imposter' };
       imposterIds.push(players[idx].id);
     });
 
@@ -96,10 +98,11 @@ export const useGameStore = create<GameStore>((set, get) => ({
     });
   },
 
+  // Bug #2 fix: setPhase no longer silently resets currentPlayerIndex
   setPhase: (phase) => {
     const { round } = get();
     if (!round) return;
-    set({ round: { ...round, phase, currentPlayerIndex: 0 } });
+    set({ round: { ...round, phase } });
   },
 
   nextPlayer: () => {
@@ -167,20 +170,36 @@ export const useGameStore = create<GameStore>((set, get) => ({
     })).sort((a, b) => b.voteCount - a.voteCount);
   },
 
+  // Bug #3 fix: detect ties
   getMostVotedPlayerId: () => {
     const results = get().getVoteResults();
-    if (results.length === 0) return null;
-    return results[0].playerId;
+    if (results.length === 0) return { playerId: null, isTie: false };
+
+    const topVotes = results[0].voteCount;
+    if (topVotes === 0) return { playerId: null, isTie: false };
+
+    const topPlayers = results.filter((r) => r.voteCount === topVotes);
+    if (topPlayers.length > 1) {
+      return { playerId: null, isTie: true };
+    }
+    return { playerId: results[0].playerId, isTie: false };
   },
 
+  // Bug #5 fix: calculateResults no longer returns a value, always updates state
   calculateResults: () => {
     const { round, players } = get();
-    if (!round) return 'imposter_wins';
+    if (!round) return;
 
-    const mostVotedId = get().getMostVotedPlayerId();
-    const isImposter = round.imposterIds.includes(mostVotedId || '');
+    const { playerId: mostVotedId, isTie } = get().getMostVotedPlayerId();
 
-    const result: RoundResult = isImposter ? 'civilians_win' : 'imposter_wins';
+    let result: RoundResult;
+    if (isTie || !mostVotedId) {
+      // Tie: no one eliminated, imposter wins
+      result = 'imposter_wins';
+    } else {
+      const isImposter = round.imposterIds.includes(mostVotedId);
+      result = isImposter ? 'civilians_win' : 'imposter_wins';
+    }
 
     // Update scores
     const updatedPlayers = players.map((p) => {
@@ -197,10 +216,9 @@ export const useGameStore = create<GameStore>((set, get) => ({
       players: updatedPlayers,
       round: { ...round, roundResult: result, phase: 'results' },
     });
-
-    return result;
   },
 
+  // Bug #8 fix: revoke civilian points when imposter guesses correctly
   imposterFinalGuess: (word) => {
     const { round, players } = get();
     if (!round) return false;
@@ -211,6 +229,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
       const updatedPlayers = players.map((p) => {
         if (p.role === 'imposter') {
           return { ...p, score: p.score + 3 };
+        }
+        // Revoke civilian win bonus
+        if (p.role === 'civilian' && round.roundResult === 'civilians_win') {
+          return { ...p, score: p.score - 1 };
         }
         return p;
       });
@@ -230,29 +252,35 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     const secretWord = getRandomWord(round.categoryId, usedWords);
 
-    // Reset player states but keep scores
-    const resetPlayers = shuffleArray(players.map((p) => ({
+    // Reset player states but keep scores — create fresh objects
+    const resetPlayers: Player[] = players.map((p) => ({
       ...p,
       role: 'civilian' as Role,
       hasVoted: false,
       voteTargetId: null,
       hasRevealed: false,
       hasGivenHint: false,
-    })));
+    }));
 
-    // Assign new imposters
-    const shuffledIndices = shuffleArray(resetPlayers.map((_, i) => i));
+    // Shuffle play order
+    const shuffled = shuffleArray(resetPlayers);
+
+    // Assign new imposters immutably
+    const shuffledIndices = shuffleArray(shuffled.map((_, i) => i));
     const imposterCount = round.imposterIds.length;
     const imposterIndices = shuffledIndices.slice(0, imposterCount);
     const imposterIds: string[] = [];
 
-    imposterIndices.forEach((idx) => {
-      resetPlayers[idx].role = 'imposter';
-      imposterIds.push(resetPlayers[idx].id);
+    const finalPlayers = shuffled.map((p, idx) => {
+      if (imposterIndices.includes(idx)) {
+        imposterIds.push(p.id);
+        return { ...p, role: 'imposter' as Role };
+      }
+      return p;
     });
 
     set({
-      players: resetPlayers,
+      players: finalPlayers,
       round: {
         ...round,
         secretWord,
@@ -267,12 +295,6 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   resetGame: () => {
     set({ players: [], round: null, usedWords: [] });
-  },
-
-  getCurrentPlayer: () => {
-    const { players, round } = get();
-    if (!round || round.currentPlayerIndex >= players.length) return null;
-    return players[round.currentPlayerIndex];
   },
 
   getPlayerById: (id) => {

@@ -9,9 +9,10 @@ import { PLAYER_COLORS } from '@/constants/config';
 
 export default function PassScreen() {
   const router = useRouter();
-  const currentPlayer = useGameStore((s) => s.getCurrentPlayer());
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
+  const currentPlayer = round && round.currentPlayerIndex < players.length
+    ? players[round.currentPlayerIndex] : null;
 
   if (!currentPlayer || !round) {
     router.replace('/');
