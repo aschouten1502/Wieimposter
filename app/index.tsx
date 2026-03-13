@@ -25,7 +25,7 @@ export default function HomeScreen() {
         />
         <View style={styles.buttonRow}>
           <Button
-            title="Hoe te Spelen"
+            title="Uitleg"
             onPress={() => router.push('/how-to-play')}
             variant="secondary"
             size="md"

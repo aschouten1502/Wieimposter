@@ -178,7 +178,7 @@ export default function RevealScreen() {
       <View style={styles.buttonContainer}>
         {revealed ? (
           <Button
-            title="VERBERG & GEEF DOOR"
+            title="GEEF DOOR"
             onPress={handleHide}
             size="lg"
           />

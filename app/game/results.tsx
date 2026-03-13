@@ -163,7 +163,7 @@ export default function ResultsScreen() {
         {/* Final Guess */}
         {civiliansWon && guessResult === null && !showFinalGuess && (
           <Button
-            title="IMPOSTER MAG RADEN"
+            title="IMPOSTER RAADT"
             onPress={() => setShowFinalGuess(true)}
             variant="secondary"
             size="md"

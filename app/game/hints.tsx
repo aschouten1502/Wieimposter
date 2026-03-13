@@ -47,7 +47,7 @@ export default function HintsScreen() {
 
       <View style={styles.buttonContainer}>
         <Button
-          title="KLAAR — GA STEMMEN"
+          title="GA STEMMEN"
           onPress={handleDone}
           size="lg"
         />
