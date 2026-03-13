@@ -43,7 +43,7 @@ export default function VoteScreen() {
 
     useGameStore.setState({
       players: updatedPlayers,
-      round: { ...round, roundResult: result, phase: 'results' },
+      round: { ...round, roundResult: result, votedPlayerId: selectedId, phase: 'results' },
     });
 
     router.replace('/game/results');
