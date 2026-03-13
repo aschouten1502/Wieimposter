@@ -1,12 +1,12 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { Stepper } from '@/components/Stepper';
 import { PlayerInput } from '@/components/PlayerInput';
 import { CategoryCard } from '@/components/CategoryCard';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { MIN_PLAYERS, MAX_PLAYERS } from '@/constants/config';
 import { categories } from '@/data/categories';
 import { useGameStore } from '@/store/gameStore';
@@ -48,10 +48,8 @@ export default function SetupScreen() {
   }, []);
 
   const handleStart = () => {
-    // Validate names
     const names = playerNames.map((n, i) => n.trim() || `Speler ${i + 1}`);
 
-    // Check for duplicates and fix
     const seen = new Set<string>();
     const uniqueNames = names.map((name) => {
       let finalName = name;
@@ -112,7 +110,7 @@ export default function SetupScreen() {
           onChange={setImpostersCount}
         />
 
-        <View style={styles.trollRow}>
+        <View style={[styles.trollRow, Platform.OS === 'web' && (GlassStyle as any)]}>
           <View style={styles.trollInfo}>
             <Text style={styles.trollLabel}>Troll Modus</Text>
             <Text style={styles.trollDesc}>Kans dat iedereen imposter is</Text>
@@ -166,10 +164,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.glass,
     borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     marginTop: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   trollInfo: {
     flex: 1,

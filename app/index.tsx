@@ -60,10 +60,10 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   title: {
-    color: Colors.text,
+    color: Colors.textSecondary,
     fontSize: FontSize.xxl,
-    fontWeight: '800',
-    letterSpacing: 4,
+    fontWeight: '300',
+    letterSpacing: 6,
   },
   titleAccent: {
     color: Colors.primary,
@@ -71,12 +71,15 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     letterSpacing: 6,
     marginTop: -4,
+    textShadowColor: Colors.primaryGlow,
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 30,
   },
   subtitle: {
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
     fontSize: FontSize.md,
-    marginTop: Spacing.sm,
-    letterSpacing: 1,
+    marginTop: Spacing.md,
+    letterSpacing: 2,
   },
   buttons: {
     width: '100%',

@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { PLAYER_COLORS } from '@/constants/config';
 
 interface PlayerBadgeProps {
@@ -27,8 +27,15 @@ export function PlayerBadge({
   const color = PLAYER_COLORS[index % PLAYER_COLORS.length];
 
   const content = (
-    <View style={[styles.badge, selected && styles.badgeSelected, disabled && styles.badgeDisabled]}>
-      <View style={[styles.dot, { backgroundColor: color }]} />
+    <View
+      style={[
+        styles.badge,
+        selected && styles.badgeSelected,
+        disabled && styles.badgeDisabled,
+        Platform.OS === 'web' && (GlassStyle as any),
+      ]}
+    >
+      <View style={[styles.dot, { backgroundColor: color, shadowColor: color }]} />
       <Text style={styles.name}>{name}</Text>
       {showRole && isImposter !== undefined && (
         <Text style={[styles.role, isImposter ? styles.roleImposter : styles.roleCivilian]}>
@@ -58,13 +65,13 @@ const styles = StyleSheet.create({
   badge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.lg,
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.md,
     marginBottom: Spacing.sm,
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   badgeSelected: {
     borderColor: Colors.primary,
@@ -78,6 +85,9 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
     marginRight: Spacing.sm,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
   },
   name: {
     color: Colors.text,

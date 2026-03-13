@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Colors, Spacing } from '@/constants/theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Spacing } from '@/constants/theme';
 
 interface ScreenContainerProps {
   children: React.ReactNode;
@@ -11,22 +12,30 @@ interface ScreenContainerProps {
 
 export function ScreenContainer({ children, style, centered }: ScreenContainerProps) {
   return (
-    <SafeAreaView style={styles.safe}>
-      <View style={[styles.container, centered && styles.centered, style]}>
-        {children}
-      </View>
-    </SafeAreaView>
+    <LinearGradient
+      colors={['#0A0A1A', '#0F1128', '#0A0A1A']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.gradient}
+    >
+      <SafeAreaView style={styles.safe}>
+        <View style={[styles.container, centered && styles.centered, style]}>
+          {children}
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   safe: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
     paddingHorizontal: Spacing.lg,
     paddingBottom: Spacing.md,
   },

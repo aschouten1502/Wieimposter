@@ -1,6 +1,6 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, View } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { Category } from '@/types/game';
 import { useHaptics } from '@/hooks/useHaptics';
 
@@ -22,7 +22,11 @@ export function CategoryCard({ category, selected, onPress }: CategoryCardProps)
     <TouchableOpacity
       onPress={handlePress}
       activeOpacity={0.7}
-      style={[styles.card, selected && styles.cardSelected]}
+      style={[
+        styles.card,
+        selected && styles.cardSelected,
+        Platform.OS === 'web' && (GlassStyle as any),
+      ]}
     >
       <Text style={styles.icon}>{category.icon}</Text>
       <Text style={styles.name}>{category.name}</Text>
@@ -33,18 +37,22 @@ export function CategoryCard({ category, selected, onPress }: CategoryCardProps)
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.xl,
     padding: Spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
     minHeight: 110,
   },
   cardSelected: {
     borderColor: Colors.primary,
     backgroundColor: Colors.surfaceLight,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.2,
+    shadowRadius: 12,
   },
   icon: {
     fontSize: 32,

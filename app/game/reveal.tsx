@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { PLAYER_COLORS } from '@/constants/config';
@@ -13,6 +13,7 @@ export default function RevealScreen() {
   const router = useRouter();
   const haptics = useHaptics();
   const [revealed, setRevealed] = useState(false);
+  const flipAnim = useRef(new Animated.Value(0)).current;
 
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
@@ -43,6 +44,12 @@ export default function RevealScreen() {
     } else {
       haptics.success();
     }
+    Animated.spring(flipAnim, {
+      toValue: 1,
+      friction: 8,
+      tension: 60,
+      useNativeDriver: true,
+    }).start();
   };
 
   const handleHide = () => {
@@ -58,47 +65,111 @@ export default function RevealScreen() {
     }
   };
 
+  // Front of card (unrevealed) - rotates from 0deg to 90deg
+  const frontInterpolate = flipAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: ['0deg', '90deg', '90deg'],
+  });
+  const frontOpacity = flipAnim.interpolate({
+    inputRange: [0, 0.5, 0.5],
+    outputRange: [1, 0, 0],
+  });
+
+  // Back of card (revealed) - rotates from -90deg to 0deg
+  const backInterpolate = flipAnim.interpolate({
+    inputRange: [0, 0.5, 1],
+    outputRange: ['-90deg', '-90deg', '0deg'],
+  });
+  const backOpacity = flipAnim.interpolate({
+    inputRange: [0.5, 0.5, 1],
+    outputRange: [0, 1, 1],
+  });
+
+  const roleColor = isImposter ? Colors.imposter : Colors.civilian;
+
   return (
     <ScreenContainer centered>
-      <Text style={[styles.playerName, { color }]}>{currentPlayer.name}</Text>
+      {/* Player name pill */}
+      <View style={[styles.namePill, Platform.OS === 'web' && (GlassStyle as any)]}>
+        <View style={[styles.nameDot, { backgroundColor: color }]} />
+        <Text style={[styles.playerName, { color }]}>{currentPlayer.name}</Text>
+      </View>
 
-      {!revealed ? (
-        <TouchableOpacity
-          style={styles.revealArea}
-          onPress={handleReveal}
-          activeOpacity={0.8}
+      {/* Card container */}
+      <View style={styles.cardWrapper}>
+        {/* Front of card */}
+        <Animated.View
+          style={[
+            styles.card,
+            styles.cardFront,
+            Platform.OS === 'web' && (GlassStyle as any),
+            { transform: [{ perspective: 1000 }, { rotateY: frontInterpolate }], opacity: frontOpacity },
+          ]}
         >
-          <Text style={styles.revealIcon}>👁️</Text>
-          <Text style={styles.revealText}>TAP OM JE ROL TE ZIEN</Text>
-          <Text style={styles.revealHint}>Houd je scherm verborgen!</Text>
-        </TouchableOpacity>
-      ) : (
-        <View style={styles.roleContainer}>
+          <TouchableOpacity
+            style={styles.cardTouchable}
+            onPress={handleReveal}
+            activeOpacity={0.9}
+            disabled={revealed}
+          >
+            <View style={styles.cardPattern}>
+              <Text style={styles.cardQuestionMark}>?</Text>
+            </View>
+            <View style={styles.cardFrontContent}>
+              <Text style={styles.tapIcon}>👁️</Text>
+              <Text style={styles.tapText}>TAP OM TE ONTHULLEN</Text>
+              <Text style={styles.tapHint}>Houd je scherm verborgen!</Text>
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
+
+        {/* Back of card (role) */}
+        <Animated.View
+          style={[
+            styles.card,
+            styles.cardBack,
+            Platform.OS === 'web' && (GlassStyle as any),
+            { borderColor: roleColor },
+            { transform: [{ perspective: 1000 }, { rotateY: backInterpolate }], opacity: backOpacity },
+          ]}
+        >
+          <View style={[styles.roleGlow, { shadowColor: roleColor }]} />
           {isImposter ? (
-            <>
-              <Text style={styles.imposterIcon}>🕵️</Text>
-              <Text style={styles.imposterText}>JIJ BENT DE</Text>
-              <Text style={styles.imposterTitle}>IMPOSTER</Text>
+            <View style={styles.roleContent}>
+              <Text style={styles.roleEmoji}>🕵️</Text>
+              <Text style={styles.roleLabel}>JIJ BENT DE</Text>
+              <Text style={[styles.roleTitle, { color: Colors.imposter }]}>IMPOSTER</Text>
               {isTrollRound ? (
-                <Text style={styles.imposterHint}>Plot twist: iedereen is imposter!</Text>
+                <View style={styles.hintBox}>
+                  <Text style={styles.hintText}>Plot twist: iedereen is imposter!</Text>
+                </View>
               ) : (
                 <>
-                  <Text style={styles.categoryHint}>Categorie: {categoryName}</Text>
-                  <Text style={styles.imposterHint}>Je kent het woord niet. Bluf mee!</Text>
+                  <View style={styles.categoryPill}>
+                    <Text style={styles.categoryText}>{categoryName}</Text>
+                  </View>
+                  <View style={styles.hintBox}>
+                    <Text style={styles.hintText}>Je kent het woord niet. Bluf mee!</Text>
+                  </View>
                 </>
               )}
-            </>
+            </View>
           ) : (
-            <>
-              <Text style={styles.civilianIcon}>✅</Text>
-              <Text style={styles.civilianText}>Je bent een burger</Text>
-              <Text style={styles.secretWord}>{round.secretWord}</Text>
-              <Text style={styles.civilianHint}>Geef subtiele hints zonder het weg te geven</Text>
-            </>
+            <View style={styles.roleContent}>
+              <Text style={styles.roleEmoji}>✅</Text>
+              <Text style={styles.civilianLabel}>Je bent een burger</Text>
+              <View style={styles.wordContainer}>
+                <Text style={styles.secretWord}>{round.secretWord}</Text>
+              </View>
+              <View style={styles.hintBox}>
+                <Text style={styles.hintText}>Geef subtiele hints zonder het weg te geven</Text>
+              </View>
+            </View>
           )}
-        </View>
-      )}
+        </Animated.View>
+      </View>
 
+      {/* Bottom button */}
       <View style={styles.buttonContainer}>
         {revealed ? (
           <Button
@@ -115,94 +186,174 @@ export default function RevealScreen() {
 }
 
 const styles = StyleSheet.create({
+  namePill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    marginBottom: Spacing.xl,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
+  },
+  nameDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    marginRight: Spacing.sm,
+  },
   playerName: {
-    fontSize: FontSize.xxl,
+    fontSize: FontSize.xl,
     fontWeight: '800',
     letterSpacing: 2,
-    marginBottom: Spacing.xl,
   },
-  revealArea: {
+  cardWrapper: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 340,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  card: {
+    width: '100%',
+    aspectRatio: 0.65,
+    borderRadius: BorderRadius.xxl,
+    borderWidth: 1.5,
+    borderColor: Colors.glassBorder,
+    backgroundColor: Colors.surface,
+    overflow: 'hidden',
+    backfaceVisibility: 'hidden',
+  },
+  cardFront: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+  },
+  cardBack: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  cardTouchable: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.xl,
-    width: '100%',
-    borderWidth: 2,
-    borderColor: Colors.border,
-    borderStyle: 'dashed',
   },
-  revealIcon: {
-    fontSize: 64,
-    marginBottom: Spacing.md,
+  cardPattern: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    opacity: 0.04,
   },
-  revealText: {
+  cardQuestionMark: {
+    fontSize: 280,
+    fontWeight: '900',
     color: Colors.text,
-    fontSize: FontSize.xl,
+  },
+  cardFrontContent: {
+    alignItems: 'center',
+  },
+  tapIcon: {
+    fontSize: 56,
+    marginBottom: Spacing.lg,
+  },
+  tapText: {
+    color: Colors.text,
+    fontSize: FontSize.lg,
     fontWeight: '700',
     letterSpacing: 2,
   },
-  revealHint: {
+  tapHint: {
     color: Colors.textMuted,
     fontSize: FontSize.sm,
     marginTop: Spacing.sm,
   },
-  roleContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
+  roleGlow: {
+    position: 'absolute',
+    top: '20%',
+    left: '20%',
+    right: '20%',
+    bottom: '20%',
+    borderRadius: 200,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 60,
+    elevation: 0,
   },
-  imposterIcon: {
-    fontSize: 80,
+  roleContent: {
+    alignItems: 'center',
+    paddingHorizontal: Spacing.xl,
+  },
+  roleEmoji: {
+    fontSize: 72,
     marginBottom: Spacing.md,
   },
-  imposterText: {
+  roleLabel: {
     color: Colors.textSecondary,
-    fontSize: FontSize.xl,
+    fontSize: FontSize.lg,
     fontWeight: '600',
+    letterSpacing: 1,
   },
-  imposterTitle: {
-    color: Colors.imposter,
+  roleTitle: {
     fontSize: FontSize.display,
     fontWeight: '900',
     letterSpacing: 4,
   },
-  categoryHint: {
-    color: Colors.accent,
-    fontSize: FontSize.lg,
-    fontWeight: '700',
-    marginTop: Spacing.lg,
-    textAlign: 'center',
-  },
-  imposterHint: {
-    color: Colors.textMuted,
-    fontSize: FontSize.md,
-    marginTop: Spacing.sm,
-    textAlign: 'center',
-  },
-  civilianIcon: {
-    fontSize: 64,
-    marginBottom: Spacing.md,
-  },
-  civilianText: {
+  civilianLabel: {
     color: Colors.civilian,
     fontSize: FontSize.xl,
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: Spacing.lg,
+  },
+  wordContainer: {
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.xl,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
+    marginBottom: Spacing.md,
   },
   secretWord: {
     color: Colors.text,
-    fontSize: FontSize.display,
+    fontSize: FontSize.xxxl,
     fontWeight: '900',
     letterSpacing: 2,
     textAlign: 'center',
   },
-  civilianHint: {
-    color: Colors.textMuted,
-    fontSize: FontSize.md,
+  categoryPill: {
+    backgroundColor: Colors.accentGlow,
+    borderRadius: BorderRadius.full,
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
     marginTop: Spacing.lg,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 215, 0, 0.3)',
+  },
+  categoryText: {
+    color: Colors.accent,
+    fontSize: FontSize.md,
+    fontWeight: '700',
+  },
+  hintBox: {
+    marginTop: Spacing.md,
+  },
+  hintText: {
+    color: Colors.textMuted,
+    fontSize: FontSize.sm,
     textAlign: 'center',
+    lineHeight: 20,
   },
   buttonContainer: {
     width: '100%',

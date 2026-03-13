@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { PlayerBadge } from '@/components/PlayerBadge';
-import { Colors, Spacing, FontSize } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 
 export default function HintsScreen() {
@@ -25,7 +25,7 @@ export default function HintsScreen() {
 
   return (
     <ScreenContainer>
-      <View style={styles.header}>
+      <View style={[styles.header, Platform.OS === 'web' && (GlassStyle as any)]}>
         <Text style={styles.phase}>HINT RONDE</Text>
         <Text style={styles.title}>Geef om de beurt 2 woorden!</Text>
         <Text style={styles.subtitle}>
@@ -61,6 +61,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: Spacing.lg,
     marginBottom: Spacing.xl,
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.xl,
+    padding: Spacing.lg,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   phase: {
     color: Colors.accent,

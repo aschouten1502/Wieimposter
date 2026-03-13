@@ -6,8 +6,9 @@ import {
   ViewStyle,
   TextStyle,
   ActivityIndicator,
+  Platform,
 } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius, ButtonHeight } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, ButtonHeight, GlassStyle } from '@/constants/theme';
 import { useHaptics } from '@/hooks/useHaptics';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -44,6 +45,8 @@ export function Button({
     onPress();
   };
 
+  const isGlass = variant === 'secondary' || variant === 'ghost';
+
   return (
     <TouchableOpacity
       onPress={handlePress}
@@ -55,6 +58,7 @@ export function Button({
         styles[`size_${size}`],
         fullWidth && styles.fullWidth,
         disabled && styles.disabled,
+        isGlass && Platform.OS === 'web' && (GlassStyle as ViewStyle),
         style,
       ]}
     >
@@ -80,20 +84,30 @@ const styles = StyleSheet.create({
   },
   primary: {
     backgroundColor: Colors.primary,
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 8,
   },
   secondary: {
-    backgroundColor: Colors.surface,
-    borderWidth: 2,
-    borderColor: Colors.border,
+    backgroundColor: Colors.glass,
+    borderWidth: 1,
+    borderColor: Colors.glassBorder,
   },
   danger: {
     backgroundColor: Colors.danger,
+    shadowColor: Colors.danger,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
   ghost: {
     backgroundColor: 'transparent',
   },
   disabled: {
-    opacity: 0.5,
+    opacity: 0.4,
   },
   size_sm: {
     height: ButtonHeight.sm,

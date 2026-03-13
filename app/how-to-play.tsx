@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 
 const RULES = [
   {
@@ -45,7 +45,10 @@ export default function HowToPlayScreen() {
         <Text style={styles.title}>Hoe te Spelen</Text>
 
         {RULES.map((rule, index) => (
-          <View key={index} style={styles.ruleCard}>
+          <View
+            key={index}
+            style={[styles.ruleCard, Platform.OS === 'web' && (GlassStyle as any)]}
+          >
             <View style={styles.ruleHeader}>
               <Text style={styles.ruleEmoji}>{rule.emoji}</Text>
               <View style={styles.ruleNumber}>
@@ -57,7 +60,7 @@ export default function HowToPlayScreen() {
           </View>
         ))}
 
-        <View style={styles.tipCard}>
+        <View style={[styles.tipCard, Platform.OS === 'web' && (GlassStyle as any)]}>
           <Text style={styles.tipTitle}>💡 Pro tip</Text>
           <Text style={styles.tipText}>
             Als imposter: probeer hints te geven die vaag genoeg zijn om niet op te vallen, maar specifiek genoeg om verdacht over te komen als burger.
@@ -88,10 +91,12 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
   },
   ruleCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.xl,
     padding: Spacing.lg,
     marginBottom: Spacing.md,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   ruleHeader: {
     flexDirection: 'row',
@@ -109,6 +114,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: Colors.primary,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
   },
   ruleNumberText: {
     color: Colors.text,
@@ -127,12 +136,14 @@ const styles = StyleSheet.create({
     lineHeight: 22,
   },
   tipCard: {
-    backgroundColor: Colors.surfaceLight,
-    borderRadius: BorderRadius.lg,
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.xl,
     padding: Spacing.lg,
     marginTop: Spacing.md,
     borderLeftWidth: 4,
     borderLeftColor: Colors.accent,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   tipTitle: {
     color: Colors.accent,

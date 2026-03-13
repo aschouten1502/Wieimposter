@@ -1,8 +1,8 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Switch, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useSettingsStore } from '@/store/settingsStore';
 
 export default function SettingsScreen() {
@@ -21,22 +21,22 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Geluid & Feedback</Text>
 
-          <View style={styles.row}>
+          <View style={[styles.row, Platform.OS === 'web' && (GlassStyle as any)]}>
             <Text style={styles.rowLabel}>Geluid</Text>
             <Switch
               value={settings.soundEnabled}
               onValueChange={settings.setSoundEnabled}
-              trackColor={{ false: Colors.surface, true: Colors.primary }}
+              trackColor={{ false: Colors.glass, true: Colors.primary }}
               thumbColor={Colors.text}
             />
           </View>
 
-          <View style={styles.row}>
+          <View style={[styles.row, Platform.OS === 'web' && (GlassStyle as any)]}>
             <Text style={styles.rowLabel}>Haptics</Text>
             <Switch
               value={settings.hapticsEnabled}
               onValueChange={settings.setHapticsEnabled}
-              trackColor={{ false: Colors.surface, true: Colors.primary }}
+              trackColor={{ false: Colors.glass, true: Colors.primary }}
               thumbColor={Colors.text}
             />
           </View>
@@ -84,10 +84,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.surface,
-    borderRadius: BorderRadius.md,
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   rowLabel: {
     color: Colors.text,

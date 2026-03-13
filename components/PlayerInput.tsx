@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius } from '@/constants/theme';
+import { View, TextInput, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
+import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { PLAYER_COLORS } from '@/constants/config';
 
 interface PlayerInputProps {
@@ -15,7 +15,7 @@ export function PlayerInput({ index, value, onChange, onRemove, showRemove }: Pl
   const color = PLAYER_COLORS[index % PLAYER_COLORS.length];
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, Platform.OS === 'web' && (GlassStyle as any)]}>
       <View style={[styles.indicator, { backgroundColor: color }]} />
       <TextInput
         style={styles.input}
@@ -39,10 +39,12 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.glass,
     borderRadius: BorderRadius.md,
     marginBottom: Spacing.sm,
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
   },
   indicator: {
     width: 4,
