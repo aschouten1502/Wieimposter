@@ -14,14 +14,24 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <link rel="manifest" href="/manifest.json" />
         <ScrollViewStyleReset />
         <style dangerouslySetInnerHTML={{ __html: `
-          html, body {
+          *, *::before, *::after {
+            box-sizing: border-box;
+          }
+          html {
+            height: 100%;
+            background-color: #0A0A1A;
+          }
+          body {
             height: 100%;
             min-height: 100vh;
+            min-height: 100dvh;
             min-height: -webkit-fill-available;
             background-color: #0A0A1A;
             margin: 0;
             padding: 0;
             overflow: hidden;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: touch;
           }
           #root {
             position: fixed;
@@ -32,9 +42,14 @@ export default function Root({ children }: { children: React.ReactNode }) {
             display: flex;
             background-color: #0A0A1A;
           }
+          #root > div {
+            flex: 1;
+            display: flex;
+            background-color: #0A0A1A;
+          }
         `}} />
       </head>
-      <body>
+      <body style={{ backgroundColor: '#0A0A1A', margin: 0, padding: 0 }}>
         {children}
       </body>
     </html>
