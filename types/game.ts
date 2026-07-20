@@ -39,6 +39,7 @@ export interface Round {
   secretWord: string;
   imposterHint: string;
   imposterIds: string[];
+  originalImpostersCount: number;
   currentPlayerIndex: number;
   hintStartIndex: number;
   phase: GamePhase;

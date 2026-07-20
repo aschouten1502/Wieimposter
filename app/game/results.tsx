@@ -7,21 +7,25 @@ import { Button } from '@/components/Button';
 import { PlayerBadge } from '@/components/PlayerBadge';
 import { GlassCard } from '@/components/GlassCard';
 import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { PLAYER_COLORS } from '@/constants/config';
 import { useGameStore } from '@/store/gameStore';
 import { useStatsStore } from '@/store/statsStore';
 import { useHaptics } from '@/hooks/useHaptics';
+
+type GuessOutcome = 'correct' | 'wrong' | 'unrecognized' | null;
 
 export default function ResultsScreen() {
   const router = useRouter();
   const haptics = useHaptics();
   const [showFinalGuess, setShowFinalGuess] = useState(false);
   const [guessText, setGuessText] = useState('');
-  const [guessResult, setGuessResult] = useState<boolean | null>(null);
+  const [guessOutcome, setGuessOutcome] = useState<GuessOutcome>(null);
   const hapticsTriggered = useRef(false);
 
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
-  const imposterFinalGuess = useGameStore((s) => s.imposterFinalGuess);
+  const checkImposterGuess = useGameStore((s) => s.checkImposterGuess);
+  const applyImposterGuessed = useGameStore((s) => s.applyImposterGuessed);
   const nextRound = useGameStore((s) => s.nextRound);
   const resetGame = useGameStore((s) => s.resetGame);
   const recordGame = useStatsStore((s) => s.recordGame);
@@ -35,6 +39,12 @@ export default function ResultsScreen() {
     if (!round) return [];
     return players.filter((p) => round.imposterIds.includes(p.id));
   }, [players, round]);
+
+  const scoreboard = useMemo(() => {
+    return players
+      .map((p) => ({ ...p, originalIndex: players.findIndex((pp) => pp.id === p.id) }))
+      .sort((a, b) => b.score - a.score);
+  }, [players]);
 
   useEffect(() => {
     if (round?.roundResult && !hapticsTriggered.current) {
@@ -51,21 +61,29 @@ export default function ResultsScreen() {
   const civiliansWon = round.roundResult === 'civilians_win';
   const imposterGuessed = round.roundResult === 'imposter_guessed';
   const isTrollRound = round.trollRound === true;
+  const nobodyVoted = !round.votedPlayerId;
+
+  const acceptGuess = () => {
+    applyImposterGuessed();
+    setGuessOutcome('correct');
+    haptics.success();
+  };
 
   const handleFinalGuess = () => {
-    const correct = imposterFinalGuess(guessText);
-    setGuessResult(correct);
-    if (correct) {
-      haptics.error();
+    if (checkImposterGuess(guessText)) {
+      acceptGuess();
     } else {
-      haptics.success();
+      // Not an exact match — let the group decide if it counts.
+      setGuessOutcome('unrecognized');
+      haptics.warning();
     }
   };
 
   const recordAndProceed = (callback: () => void) => {
-    if (round.roundResult) {
+    const result = useGameStore.getState().round?.roundResult;
+    if (result) {
       recordGame(
-        round.roundResult,
+        result,
         players.map((p) => ({ name: p.name, role: p.role }))
       );
     }
@@ -86,6 +104,13 @@ export default function ResultsScreen() {
     });
   };
 
+  const handleExit = () => {
+    recordAndProceed(() => {
+      resetGame();
+      router.replace('/');
+    });
+  };
+
   return (
     <ScreenContainer>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
@@ -100,7 +125,7 @@ export default function ResultsScreen() {
               >
                 TROLL RONDE!
               </Animated.Text>
-              <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.trollSubtitle}>
+              <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.subLine}>
                 Iedereen was imposter — niemand kende het woord!
               </Animated.Text>
             </>
@@ -113,6 +138,9 @@ export default function ResultsScreen() {
               >
                 IMPOSTER RAADT HET!
               </Animated.Text>
+              <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.subLine}>
+                Gepakt, maar het woord toch geraden — de imposter steelt de winst!
+              </Animated.Text>
             </>
           ) : civiliansWon ? (
             <>
@@ -123,6 +151,9 @@ export default function ResultsScreen() {
               >
                 BURGERS WINNEN!
               </Animated.Text>
+              <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.subLine}>
+                De imposter is ontmaskerd.
+              </Animated.Text>
             </>
           ) : (
             <>
@@ -132,6 +163,11 @@ export default function ResultsScreen() {
                 style={[styles.resultTitle, { color: Colors.imposter, textShadowColor: Colors.primaryGlow }]}
               >
                 IMPOSTER WINT!
+              </Animated.Text>
+              <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.subLine}>
+                {nobodyVoted
+                  ? 'Niemand werd eruit gestemd — de imposter ontsnapt.'
+                  : 'De verkeerde persoon is eruit gestemd.'}
               </Animated.Text>
             </>
           )}
@@ -164,7 +200,7 @@ export default function ResultsScreen() {
 
         {/* Voted Out */}
         {votedPlayer && !isTrollRound && (
-          <Animated.View entering={FadeInUp.duration(400).delay(1000)} style={styles.section}>
+          <Animated.View entering={FadeInUp.duration(400).delay(900)} style={styles.section}>
             <Text style={styles.sectionTitle}>Uitgestemd</Text>
             <PlayerBadge
               name={votedPlayer.name}
@@ -175,9 +211,9 @@ export default function ResultsScreen() {
           </Animated.View>
         )}
 
-        {/* Final Guess */}
-        {civiliansWon && guessResult === null && !showFinalGuess && (
-          <Animated.View entering={FadeIn.duration(400).delay(1200)}>
+        {/* Final Guess (only when the imposter got caught) */}
+        {civiliansWon && guessOutcome === null && !showFinalGuess && (
+          <Animated.View entering={FadeIn.duration(400).delay(1000)}>
             <Button
               title="IMPOSTER MAG RADEN"
               onPress={() => setShowFinalGuess(true)}
@@ -187,7 +223,7 @@ export default function ResultsScreen() {
           </Animated.View>
         )}
 
-        {showFinalGuess && guessResult === null && (
+        {showFinalGuess && (guessOutcome === null || guessOutcome === 'unrecognized') && (
           <GlassCard style={styles.guessCard}>
             <Text style={styles.guessLabel}>Imposter, raad het woord:</Text>
             <TextInput
@@ -198,35 +234,94 @@ export default function ResultsScreen() {
               placeholderTextColor={Colors.textMuted}
               autoCorrect={false}
               autoCapitalize="none"
+              editable={guessOutcome === null}
             />
-            <Button
-              title="BEVESTIG"
-              onPress={handleFinalGuess}
-              disabled={!guessText.trim()}
-              size="md"
-            />
+            {guessOutcome === null ? (
+              <Button
+                title="BEVESTIG"
+                onPress={handleFinalGuess}
+                disabled={!guessText.trim()}
+                size="md"
+              />
+            ) : (
+              <View style={styles.overrideBox}>
+                <Text style={styles.overrideText}>
+                  "{guessText.trim()}" komt niet exact overeen. Vond de groep dit tóch goed?
+                </Text>
+                <View style={styles.overrideButtons}>
+                  <Button
+                    title="JA, TELT"
+                    onPress={acceptGuess}
+                    size="md"
+                    style={styles.overrideButton}
+                  />
+                  <Button
+                    title="NEE, FOUT"
+                    onPress={() => {
+                      setGuessOutcome('wrong');
+                      haptics.error();
+                    }}
+                    variant="secondary"
+                    size="md"
+                    style={styles.overrideButton}
+                  />
+                </View>
+              </View>
+            )}
           </GlassCard>
         )}
 
-        {guessResult !== null && (
+        {(guessOutcome === 'correct' || guessOutcome === 'wrong') && (
           <Animated.View entering={ZoomIn.duration(400)}>
             <GlassCard style={styles.guessResultCard}>
-              <Text style={[styles.guessResultText, guessResult ? styles.guessCorrect : styles.guessWrong]}>
-                {guessResult ? 'CORRECT! Imposter wint alsnog!' : 'FOUT! Het was niet het juiste woord.'}
+              <Text style={[styles.guessResultText, guessOutcome === 'correct' ? styles.guessCorrect : styles.guessWrong]}>
+                {guessOutcome === 'correct'
+                  ? 'CORRECT! De imposter wint alsnog!'
+                  : 'FOUT! De burgers houden de winst.'}
               </Text>
             </GlassCard>
           </Animated.View>
         )}
 
+        {/* Scoreboard */}
+        <Animated.View entering={FadeInUp.duration(400).delay(1100)} style={styles.section}>
+          <Text style={styles.sectionTitle}>Scorebord</Text>
+          {scoreboard.map((p, i) => {
+            const color = PLAYER_COLORS[p.originalIndex % PLAYER_COLORS.length];
+            const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+            return (
+              <View
+                key={p.id}
+                style={[styles.scoreRow, Platform.OS === 'web' && (GlassStyle as any)]}
+              >
+                <Text style={styles.scoreRank}>{medal}</Text>
+                <View style={[styles.scoreDot, { backgroundColor: color }]} />
+                <Text style={styles.scoreName} numberOfLines={1}>{p.name}</Text>
+                <Text style={styles.scorePts}>{p.score}</Text>
+              </View>
+            );
+          })}
+        </Animated.View>
+
         {/* Actions */}
         <Animated.View entering={FadeInUp.duration(400).delay(1200)} style={styles.actions}>
           <Button title="VOLGENDE RONDE" onPress={handleNextRound} size="lg" />
-          <Button
-            title="NIEUW SPEL"
-            onPress={handleNewGame}
-            variant="secondary"
-            size="md"
-          />
+          <View style={styles.actionRow}>
+            <Button
+              title="Nieuw spel"
+              onPress={handleNewGame}
+              variant="secondary"
+              size="md"
+              style={styles.actionHalf}
+            />
+            <Button
+              title="Stoppen"
+              onPress={handleExit}
+              variant="ghost"
+              size="md"
+              style={styles.actionHalf}
+            />
+          </View>
         </Animated.View>
       </ScrollView>
     </ScreenContainer>
@@ -254,11 +349,12 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 0, height: 0 },
     textShadowRadius: 30,
   },
-  trollSubtitle: {
+  subLine: {
     color: Colors.textSecondary,
     fontSize: FontSize.md,
     textAlign: 'center',
     marginTop: Spacing.sm,
+    paddingHorizontal: Spacing.md,
   },
   wordCard: {
     alignItems: 'center',
@@ -307,6 +403,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.glassBorder,
   },
+  overrideBox: {
+    gap: Spacing.md,
+  },
+  overrideText: {
+    color: Colors.textSecondary,
+    fontSize: FontSize.md,
+    lineHeight: 20,
+  },
+  overrideButtons: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  overrideButton: {
+    flex: 1,
+  },
   guessResultCard: {
     marginBottom: Spacing.xl,
     alignItems: 'center',
@@ -322,8 +433,50 @@ const styles = StyleSheet.create({
   guessWrong: {
     color: Colors.civilian,
   },
+  scoreRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.glass,
+    borderRadius: BorderRadius.lg,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    marginBottom: Spacing.xs,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+  },
+  scoreRank: {
+    color: Colors.textSecondary,
+    fontSize: FontSize.lg,
+    fontWeight: '700',
+    width: 34,
+  },
+  scoreDot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginRight: Spacing.sm,
+  },
+  scoreName: {
+    color: Colors.text,
+    fontSize: FontSize.lg,
+    fontWeight: '600',
+    flex: 1,
+  },
+  scorePts: {
+    color: Colors.accent,
+    fontSize: FontSize.xl,
+    fontWeight: '900',
+    fontVariant: ['tabular-nums'],
+  },
   actions: {
     gap: Spacing.md,
     marginTop: Spacing.md,
+  },
+  actionRow: {
+    flexDirection: 'row',
+    gap: Spacing.sm,
+  },
+  actionHalf: {
+    flex: 1,
   },
 });

@@ -50,7 +50,7 @@ export default function HintStartScreen() {
         </Animated.View>
 
         <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.hint}>
-          Geef om de beurt 2 woorden als hint
+          Geef om de beurt één woord als hint
         </Animated.Text>
       </View>
 

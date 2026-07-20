@@ -18,17 +18,17 @@ const RULES = [
   {
     emoji: '💡',
     title: 'Hints geven',
-    description: 'Geef om de beurt 2 woorden als hint in de groep. Wees subtiel genoeg zodat de imposter het niet raadt!',
+    description: 'Geef om de beurt één woord dat bij het geheime woord past. Wees subtiel genoeg zodat de imposter het niet raadt!',
   },
   {
     emoji: '👉',
     title: 'Wijzen',
-    description: 'Tel tot 3 en wijs tegelijk naar wie jij denkt dat de imposter is. De persoon met de meeste stemmen vliegt eruit!',
+    description: 'Tel tot 3 en wijs tegelijk naar wie jij denkt dat de imposter is. De persoon met de meeste stemmen vliegt eruit. Bij gelijkspel ontsnapt de imposter!',
   },
   {
     emoji: '🏆',
     title: 'Winnen',
-    description: 'Burgers winnen als de imposter wordt gevonden. De imposter wint door niet ontmaskerd te worden, of door het woord te raden als laatste kans!',
+    description: 'Burgers winnen als de imposter wordt gevonden. De imposter wint door niet ontmaskerd te worden, of door — als laatste kans na ontmaskering — het geheime woord alsnog te raden!',
   },
 ];
 

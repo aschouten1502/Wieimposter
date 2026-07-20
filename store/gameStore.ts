@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Player, GamePhase, Round, RoundResult, Role } from '@/types/game';
 import { getRandomWordFromCategories } from '@/data/categories';
-import { generateId, shuffleArray } from '@/utils/helpers';
+import { generateId, shuffleArray, getMaxImposters, normalizeGuess } from '@/utils/helpers';
 
 interface GameStore {
   players: Player[];
@@ -21,8 +21,10 @@ interface GameStore {
   markPlayerRevealed: (playerId: string) => void;
   allPlayersRevealed: () => boolean;
 
-  // Results
-  imposterFinalGuess: (word: string) => boolean;
+  // Voting & results
+  resolveVote: (votedPlayerId: string | null) => void;
+  checkImposterGuess: (word: string) => boolean;
+  applyImposterGuessed: () => void;
 
   // Game flow
   nextRound: () => void;
@@ -31,6 +33,71 @@ interface GameStore {
   // Helpers
   getPlayerById: (id: string) => Player | null;
   getImposters: () => Player[];
+}
+
+interface BuildRoundParams {
+  players: Player[];
+  categoryIds: string[];
+  impostersCount: number;
+  trollMode: boolean;
+  usedWords: string[];
+}
+
+/**
+ * Assigns roles + picks a fresh word for a new round.
+ * Existing player identity and score are preserved; role and hasRevealed reset.
+ */
+function buildRound(params: BuildRoundParams): { players: Player[]; round: Round; word: string } {
+  const { categoryIds, impostersCount, trollMode, usedWords } = params;
+  const result = getRandomWordFromCategories(categoryIds, usedWords);
+
+  // Troll mode: 15% chance everyone becomes imposter
+  const isTrollRound = trollMode && Math.random() < 0.15;
+  const playerCount = params.players.length;
+  const safeImposters = Math.min(Math.max(1, impostersCount), getMaxImposters(playerCount));
+
+  let players: Player[] = params.players.map((p) => ({
+    ...p,
+    role: 'civilian' as Role,
+    hasRevealed: false,
+  }));
+
+  let imposterIds: string[];
+
+  if (isTrollRound) {
+    imposterIds = players.map((p) => p.id);
+    players = players.map((p) => ({ ...p, role: 'imposter' as Role }));
+  } else {
+    const imposterIndices = shuffleArray(players.map((_, i) => i)).slice(0, safeImposters);
+    imposterIds = [];
+    players = players.map((p, idx) => {
+      if (imposterIndices.includes(idx)) {
+        imposterIds.push(p.id);
+        return { ...p, role: 'imposter' as Role };
+      }
+      return p;
+    });
+  }
+
+  const hintStartIndex = Math.floor(Math.random() * playerCount);
+
+  const round: Round = {
+    categoryIds,
+    sourceCategoryId: result.categoryId,
+    secretWord: result.word,
+    imposterHint: result.hint,
+    imposterIds,
+    originalImpostersCount: impostersCount,
+    currentPlayerIndex: 0,
+    hintStartIndex,
+    phase: 'passing',
+    roundResult: null,
+    votedPlayerId: null,
+    trollModeEnabled: trollMode,
+    trollRound: isTrollRound,
+  };
+
+  return { players, round, word: result.word };
 }
 
 export const useGameStore = create<GameStore>((set, get) => ({
@@ -42,15 +109,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   initGame: (playerNames, categoryIds, impostersCount, trollMode) => {
     const { usedWords } = get();
-    const result = getRandomWordFromCategories(categoryIds, usedWords);
 
-    // Troll mode: 15% chance everyone becomes imposter
-    const isTrollRound = trollMode && Math.random() < 0.15;
-
-    // Cap imposters to safe maximum
-    const safeImposters = Math.min(impostersCount, Math.max(1, Math.floor(playerNames.length / 3)));
-
-    const players: Player[] = playerNames.map((name) => ({
+    const basePlayers: Player[] = playerNames.map((name) => ({
       id: generateId(),
       name,
       role: 'civilian' as Role,
@@ -58,46 +118,15 @@ export const useGameStore = create<GameStore>((set, get) => ({
       hasRevealed: false,
     }));
 
-    let imposterIds: string[];
-
-    if (isTrollRound) {
-      imposterIds = players.map((p) => p.id);
-      players.forEach((_, idx) => {
-        players[idx] = { ...players[idx], role: 'imposter' };
-      });
-    } else {
-      const shuffledIndices = shuffleArray(players.map((_, i) => i));
-      const imposterIndices = shuffledIndices.slice(0, safeImposters);
-      imposterIds = [];
-
-      imposterIndices.forEach((idx) => {
-        players[idx] = { ...players[idx], role: 'imposter' };
-        imposterIds.push(players[idx].id);
-      });
-    }
-
-    const hintStartIndex = Math.floor(Math.random() * players.length);
-
-    const round: Round = {
+    const { players, round, word } = buildRound({
+      players: basePlayers,
       categoryIds,
-      sourceCategoryId: result.categoryId,
-      secretWord: result.word,
-      imposterHint: result.hint,
-      imposterIds,
-      currentPlayerIndex: 0,
-      hintStartIndex,
-      phase: 'passing',
-      roundResult: null,
-      votedPlayerId: null,
-      trollModeEnabled: trollMode,
-      trollRound: isTrollRound,
-    };
-
-    set({
-      players,
-      round,
-      usedWords: [...usedWords, result.word],
+      impostersCount,
+      trollMode,
+      usedWords,
     });
+
+    set({ players, round, usedWords: [...usedWords, word] });
   },
 
   setPhase: (phase) => {
@@ -130,90 +159,82 @@ export const useGameStore = create<GameStore>((set, get) => ({
     return get().players.every((p) => p.hasRevealed);
   },
 
-  imposterFinalGuess: (word) => {
+  /**
+   * Resolve the group vote.
+   * - votedPlayerId === null  → tie / nobody eliminated → imposter escapes and wins.
+   * - voted player is imposter → civilians win.
+   * - voted player is civilian → imposter wins.
+   */
+  resolveVote: (votedPlayerId) => {
     const { round, players } = get();
-    if (!round) return false;
+    if (!round) return;
 
-    const correct = word.toLowerCase().trim() === round.secretWord.toLowerCase().trim();
-
-    if (correct) {
-      const updatedPlayers = players.map((p) => {
-        if (p.role === 'imposter') {
-          return { ...p, score: p.score + 3 };
-        }
-        if (p.role === 'civilian' && round.roundResult === 'civilians_win') {
-          return { ...p, score: p.score - 1 };
-        }
-        return p;
-      });
-
+    // Troll round: nobody actually knew the word, so the vote is just for fun.
+    if (round.trollRound) {
       set({
-        players: updatedPlayers,
-        round: { ...round, roundResult: 'imposter_guessed' },
+        round: { ...round, roundResult: 'imposter_wins', votedPlayerId, phase: 'results' },
       });
+      return;
     }
 
-    return correct;
+    const caught = votedPlayerId !== null && round.imposterIds.includes(votedPlayerId);
+    const result: RoundResult = caught ? 'civilians_win' : 'imposter_wins';
+
+    const updatedPlayers = players.map((p) => {
+      if (result === 'civilians_win' && p.role === 'civilian') {
+        return { ...p, score: p.score + 1 };
+      }
+      if (result === 'imposter_wins' && p.role === 'imposter') {
+        return { ...p, score: p.score + 2 };
+      }
+      return p;
+    });
+
+    set({
+      players: updatedPlayers,
+      round: { ...round, roundResult: result, votedPlayerId, phase: 'results' },
+    });
+  },
+
+  // Pure, forgiving comparison — does not mutate state.
+  checkImposterGuess: (word) => {
+    const { round } = get();
+    if (!round) return false;
+    return normalizeGuess(word) === normalizeGuess(round.secretWord);
+  },
+
+  // Apply the "imposter guessed the word" outcome (steals the win).
+  // Only reachable after a civilians_win, where each civilian already got +1.
+  // The imposter steals the round: revert that +1 and award the imposters +3.
+  applyImposterGuessed: () => {
+    const { round, players } = get();
+    if (!round) return;
+
+    const updatedPlayers = players.map((p) => {
+      if (p.role === 'imposter') return { ...p, score: p.score + 3 };
+      // Revert the win point granted by the vote (never drops below prior total).
+      return { ...p, score: p.score - 1 };
+    });
+
+    set({
+      players: updatedPlayers,
+      round: { ...round, roundResult: 'imposter_guessed' },
+    });
   },
 
   nextRound: () => {
     const { players, round, usedWords } = get();
     if (!round) return;
 
-    const result = getRandomWordFromCategories(round.categoryIds, usedWords);
-
-    const isTrollRound = round.trollModeEnabled && Math.random() < 0.15;
-
-    const resetPlayers: Player[] = players.map((p) => ({
-      ...p,
-      role: 'civilian' as Role,
-      hasRevealed: false,
-    }));
-
-    let imposterIds: string[];
-    let finalPlayers: Player[];
-
-    if (isTrollRound) {
-      imposterIds = resetPlayers.map((p) => p.id);
-      finalPlayers = resetPlayers.map((p) => ({ ...p, role: 'imposter' as Role }));
-    } else {
-      const shuffledIndices = shuffleArray(resetPlayers.map((_, i) => i));
-      const imposterCount = round.trollRound
-        ? Math.max(1, Math.floor(resetPlayers.length / 3))
-        : round.imposterIds.length;
-      const imposterIndices = shuffledIndices.slice(0, Math.min(imposterCount, Math.max(1, Math.floor(resetPlayers.length / 3))));
-      imposterIds = [];
-
-      finalPlayers = resetPlayers.map((p, idx) => {
-        if (imposterIndices.includes(idx)) {
-          imposterIds.push(p.id);
-          return { ...p, role: 'imposter' as Role };
-        }
-        return p;
-      });
-    }
-
-    const hintStartIndex = Math.floor(Math.random() * finalPlayers.length);
-
-    set({
-      players: finalPlayers,
-      round: {
-        ...round,
-        categoryIds: round.categoryIds,
-        sourceCategoryId: result.categoryId,
-        secretWord: result.word,
-        imposterHint: result.hint,
-        imposterIds,
-        currentPlayerIndex: 0,
-        hintStartIndex,
-        phase: 'passing',
-        roundResult: null,
-        votedPlayerId: null,
-        trollModeEnabled: round.trollModeEnabled,
-        trollRound: isTrollRound,
-      },
-      usedWords: [...usedWords, result.word],
+    const { players: newPlayers, round: newRound, word } = buildRound({
+      players, // scores are preserved; roles + hasRevealed reset inside buildRound
+      categoryIds: round.categoryIds,
+      impostersCount: round.originalImpostersCount,
+      trollMode: round.trollModeEnabled,
+      usedWords,
     });
+
+    set({ players: newPlayers, round: newRound, usedWords: [...usedWords, word] });
   },
 
   resetGame: () => {

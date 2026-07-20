@@ -39,10 +39,10 @@ export default function HintsScreen() {
     <ScreenContainer>
       <View style={[styles.header, Platform.OS === 'web' && (GlassStyle as any)]}>
         <Text style={styles.phase}>HINT RONDE {hintRound}</Text>
-        <Text style={styles.title}>Geef om de beurt 1 hint!</Text>
+        <Text style={styles.title}>Geef om de beurt één woord!</Text>
         <Text style={styles.subtitle}>
           Begin bij de eerste speler en ga de kring rond.{'\n'}
-          Geef subtiele hints — niet te makkelijk!
+          Eén woord dat bij het geheime woord past — subtiel, niet te makkelijk!
         </Text>
       </View>
 

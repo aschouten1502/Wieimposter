@@ -157,7 +157,7 @@ export default function RevealScreen() {
                 <Text style={styles.secretWord}>{round.secretWord}</Text>
               </View>
               <View style={styles.hintBox}>
-                <Text style={styles.hintText}>Geef subtiele hints zonder het weg te geven</Text>
+                <Text style={styles.hintText}>Geef straks één woord als hint — subtiel, niet weggeven</Text>
               </View>
             </View>
           )}
