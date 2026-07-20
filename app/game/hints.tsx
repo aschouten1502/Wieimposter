@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { PlayerBadge } from '@/components/PlayerBadge';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 
 export default function HintsScreen() {
@@ -39,15 +39,15 @@ export default function HintsScreen() {
     <ScreenContainer>
       <View style={[styles.header, Platform.OS === 'web' && (GlassStyle as any)]}>
         <Text style={styles.phase}>HINT RONDE {hintRound}</Text>
-        <Text style={styles.title}>Geef om de beurt één woord!</Text>
+        <Text style={styles.title}>Eén woord per persoon</Text>
         <Text style={styles.subtitle}>
           Begin bij de eerste speler en ga de kring rond.{'\n'}
-          Eén woord dat bij het geheime woord past — subtiel, niet te makkelijk!
+          Subtiel — niet te makkelijk.
         </Text>
       </View>
 
       <View style={styles.playerList}>
-        <Text style={styles.orderLabel}>Volgorde:</Text>
+        <Text style={styles.orderLabel}>VOLGORDE</Text>
         {orderedPlayers.map((player) => {
           const originalIndex = players.findIndex((p) => p.id === player.id);
           return (
@@ -86,24 +86,27 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.xl,
     padding: Spacing.lg,
     borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    borderColor: Colors.goldLine,
   },
   phase: {
-    color: Colors.accent,
-    fontSize: FontSize.sm,
-    fontWeight: '800',
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: FontSize.xs,
     letterSpacing: 3,
+    textTransform: 'uppercase',
     marginBottom: Spacing.md,
   },
   title: {
     color: Colors.text,
+    fontFamily: Fonts.display,
     fontSize: FontSize.xxl,
-    fontWeight: '800',
+    letterSpacing: 0.5,
     textAlign: 'center',
   },
   subtitle: {
     color: Colors.textSecondary,
-    fontSize: FontSize.md,
+    fontFamily: Fonts.sans,
+    fontSize: FontSize.sm,
     textAlign: 'center',
     marginTop: Spacing.sm,
     lineHeight: 22,
@@ -113,11 +116,11 @@ const styles = StyleSheet.create({
   },
   orderLabel: {
     color: Colors.textMuted,
-    fontSize: FontSize.sm,
-    fontWeight: '700',
-    letterSpacing: 2,
-    marginBottom: Spacing.sm,
+    fontFamily: Fonts.sansBold,
+    fontSize: FontSize.xs,
+    letterSpacing: 2.5,
     textTransform: 'uppercase',
+    marginBottom: Spacing.sm,
   },
   buttonContainer: {
     paddingBottom: Spacing.lg,
