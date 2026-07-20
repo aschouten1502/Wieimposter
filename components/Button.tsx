@@ -6,10 +6,9 @@ import {
   ViewStyle,
   TextStyle,
   ActivityIndicator,
-  Platform,
   Pressable,
 } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius, ButtonHeight, GlassStyle } from '@/constants/theme';
+import { Colors, Fonts, Spacing, FontSize, BorderRadius, ButtonHeight } from '@/constants/theme';
 import { useHaptics } from '@/hooks/useHaptics';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
@@ -63,7 +62,7 @@ export function Button({
     onPress();
   };
 
-  const isGlass = variant === 'secondary' || variant === 'ghost';
+  const spinnerColor = variant === 'primary' ? Colors.inkDeep : Colors.text;
 
   return (
     <Pressable
@@ -79,13 +78,12 @@ export function Button({
           styles[`size_${size}`],
           fullWidth && styles.fullWidth,
           disabled && styles.disabled,
-          isGlass && Platform.OS === 'web' && (GlassStyle as ViewStyle),
           { transform: [{ scale: scaleAnim }] },
           style,
         ]}
       >
         {loading ? (
-          <ActivityIndicator color={Colors.text} />
+          <ActivityIndicator color={spinnerColor} />
         ) : (
           <Text
             numberOfLines={1}
@@ -113,23 +111,23 @@ const styles = StyleSheet.create({
   primary: {
     backgroundColor: Colors.primary,
     shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 6,
   },
   secondary: {
-    backgroundColor: Colors.glass,
+    backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    borderColor: Colors.goldLine,
   },
   danger: {
     backgroundColor: Colors.danger,
     shadowColor: Colors.danger,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.25,
+    shadowRadius: 14,
+    elevation: 6,
   },
   ghost: {
     backgroundColor: 'transparent',
@@ -150,11 +148,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
   },
   text: {
-    fontWeight: '700',
-    letterSpacing: 1,
+    fontFamily: Fonts.sansBold,
+    letterSpacing: 2.5,
+    textTransform: 'uppercase',
   },
   text_primary: {
-    color: Colors.text,
+    color: Colors.inkDeep,
   },
   text_secondary: {
     color: Colors.text,
@@ -163,16 +162,15 @@ const styles = StyleSheet.create({
     color: Colors.text,
   },
   text_ghost: {
-    color: Colors.textSecondary,
+    color: Colors.textMuted,
   },
   text_sm: {
-    fontSize: FontSize.md,
+    fontSize: FontSize.xs,
   },
   text_md: {
-    fontSize: FontSize.lg,
+    fontSize: 13,
   },
   text_lg: {
-    fontSize: FontSize.xl,
-    letterSpacing: 2,
+    fontSize: FontSize.sm,
   },
 });

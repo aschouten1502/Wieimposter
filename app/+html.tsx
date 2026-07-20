@@ -7,7 +7,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
         <meta charSet="utf-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no, viewport-fit=cover" />
-        <meta name="theme-color" content="#0A0A1A" />
+        <meta name="theme-color" content="#0A1412" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Imposter" />
@@ -20,7 +20,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #0A0A1A;
+            background-color: #0A1412;
             overflow: hidden;
           }
           body {
@@ -29,7 +29,7 @@ export default function Root({ children }: { children: React.ReactNode }) {
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: #0A0A1A;
+            background-color: #0A1412;
             margin: 0;
             padding: 0;
             overflow: hidden;
@@ -42,11 +42,11 @@ export default function Root({ children }: { children: React.ReactNode }) {
             right: 0;
             bottom: 0;
             display: flex;
-            background-color: #0A0A1A;
+            background-color: #0A1412;
           }
         `}} />
       </head>
-      <body style={{ backgroundColor: '#0A0A1A', margin: 0, padding: 0 }}>
+      <body style={{ backgroundColor: '#0A1412', margin: 0, padding: 0 }}>
         {children}
       </body>
     </html>
