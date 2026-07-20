@@ -1,7 +1,8 @@
 import React from 'react';
 import { TouchableOpacity, Text, View, StyleSheet, Platform } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { Colors, Fonts, Spacing, BorderRadius, GlassStyle } from '@/constants/theme';
 import { Category } from '@/types/game';
+import { CategoryIcons, IconCards, IconCheck } from '@/components/icons';
 import { useHaptics } from '@/hooks/useHaptics';
 
 interface CategoryCardProps {
@@ -12,6 +13,7 @@ interface CategoryCardProps {
 
 export function CategoryCard({ category, selected, onPress }: CategoryCardProps) {
   const haptics = useHaptics();
+  const Icon = CategoryIcons[category.icon] ?? IconCards;
 
   const handlePress = () => {
     haptics.light();
@@ -30,11 +32,20 @@ export function CategoryCard({ category, selected, onPress }: CategoryCardProps)
     >
       {selected && (
         <View style={styles.checkBadge}>
-          <Text style={styles.checkText}>✓</Text>
+          <IconCheck size={13} color={Colors.inkDeep} strokeWidth={2.2} />
         </View>
       )}
-      <Text style={styles.icon}>{category.icon}</Text>
-      <Text style={[styles.name, selected && styles.nameSelected]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>{category.name}</Text>
+      <View style={styles.iconWrap}>
+        <Icon size={28} color={selected ? Colors.accent : Colors.textSecondary} />
+      </View>
+      <Text
+        style={[styles.name, selected && styles.nameSelected]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.75}
+      >
+        {category.name}
+      </Text>
       <Text style={styles.count}>{category.words.length} woorden</Text>
     </TouchableOpacity>
   );
@@ -71,19 +82,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  checkText: {
-    color: Colors.text,
-    fontSize: 12,
-    fontWeight: '800',
-  },
-  icon: {
-    fontSize: 32,
-    marginBottom: Spacing.xs,
+  iconWrap: {
+    marginBottom: Spacing.sm,
   },
   name: {
     color: Colors.text,
-    fontSize: FontSize.sm,
-    fontWeight: '700',
+    fontFamily: Fonts.sansSemi,
+    fontSize: 14,
     textAlign: 'center',
   },
   nameSelected: {
@@ -91,7 +96,8 @@ const styles = StyleSheet.create({
   },
   count: {
     color: Colors.textMuted,
-    fontSize: FontSize.xs,
-    marginTop: 2,
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    marginTop: 3,
   },
 });

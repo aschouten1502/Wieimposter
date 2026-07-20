@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { Colors, Fonts, Spacing, BorderRadius, GlassStyle } from '@/constants/theme';
+import { IconMinus, IconPlus } from '@/components/icons';
 import { useHaptics } from '@/hooks/useHaptics';
 
 interface StepperProps {
@@ -38,7 +39,7 @@ export function Stepper({ value, min, max, onChange, label }: StepperProps) {
           disabled={value <= min}
           activeOpacity={0.7}
         >
-          <Text style={[styles.buttonText, value <= min && styles.buttonTextDisabled]}>−</Text>
+          <IconMinus size={22} color={value <= min ? Colors.textMuted : Colors.primary} />
         </TouchableOpacity>
         <View style={styles.valueContainer}>
           <Text style={styles.value}>{value}</Text>
@@ -49,7 +50,7 @@ export function Stepper({ value, min, max, onChange, label }: StepperProps) {
           disabled={value >= max}
           activeOpacity={0.7}
         >
-          <Text style={[styles.buttonText, value >= max && styles.buttonTextDisabled]}>+</Text>
+          <IconPlus size={22} color={value >= max ? Colors.textMuted : Colors.primary} />
         </TouchableOpacity>
       </View>
     </View>
@@ -62,9 +63,11 @@ const styles = StyleSheet.create({
   },
   label: {
     color: Colors.textSecondary,
-    fontSize: FontSize.md,
+    fontFamily: Fonts.sansBold,
+    fontSize: 12,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
     marginBottom: Spacing.sm,
-    fontWeight: '600',
   },
   stepper: {
     flexDirection: 'row',
@@ -73,25 +76,17 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: Colors.borderLight,
+    borderColor: Colors.goldLine,
   },
   button: {
     width: 56,
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.surface,
   },
   buttonDisabled: {
-    opacity: 0.3,
-  },
-  buttonText: {
-    color: Colors.text,
-    fontSize: FontSize.xxl,
-    fontWeight: '600',
-  },
-  buttonTextDisabled: {
-    color: Colors.textMuted,
+    opacity: 0.35,
   },
   valueContainer: {
     flex: 1,
@@ -100,7 +95,8 @@ const styles = StyleSheet.create({
   },
   value: {
     color: Colors.text,
-    fontSize: FontSize.xxl,
-    fontWeight: '700',
+    fontFamily: Fonts.display,
+    fontSize: 34,
+    letterSpacing: 1,
   },
 });

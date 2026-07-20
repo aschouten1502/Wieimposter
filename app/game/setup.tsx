@@ -6,7 +6,8 @@ import { Button } from '@/components/Button';
 import { Stepper } from '@/components/Stepper';
 import { PlayerInput } from '@/components/PlayerInput';
 import { CategoryCard } from '@/components/CategoryCard';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { OrnamentDivider } from '@/components/Ornaments';
+import { Colors, Fonts, Spacing, BorderRadius, GlassStyle } from '@/constants/theme';
 import { MIN_PLAYERS, MAX_PLAYERS } from '@/constants/config';
 import { categories } from '@/data/categories';
 import { useGameStore } from '@/store/gameStore';
@@ -84,10 +85,13 @@ export default function SetupScreen() {
   return (
     <ScreenContainer>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        <Text style={styles.header}>Nieuw Spel</Text>
+        <View style={styles.headerBlock}>
+          <Text style={styles.overline}>Nieuwe ronde</Text>
+          <Text style={styles.header}>Nieuw spel</Text>
+        </View>
 
         <Stepper
-          label="Aantal Spelers"
+          label="Aantal spelers"
           value={playerCount}
           min={MIN_PLAYERS}
           max={MAX_PLAYERS}
@@ -123,7 +127,7 @@ export default function SetupScreen() {
         </View>
 
         <Stepper
-          label="Aantal Imposters"
+          label="Aantal imposters"
           value={impostersCount}
           min={1}
           max={getMaxImposters(playerCount)}
@@ -132,7 +136,7 @@ export default function SetupScreen() {
 
         <View style={[styles.trollRow, Platform.OS === 'web' && (GlassStyle as any)]}>
           <View style={styles.trollInfo}>
-            <Text style={styles.trollLabel}>Troll Modus</Text>
+            <Text style={styles.trollLabel}>Trollmodus</Text>
             <Text style={styles.trollDesc}>Kans dat iedereen imposter is</Text>
           </View>
           <Button
@@ -145,8 +149,10 @@ export default function SetupScreen() {
           />
         </View>
 
+        <OrnamentDivider style={styles.divider} />
+
         <View style={styles.startButton}>
-          <Button title="START SPEL" onPress={handleStart} size="lg" />
+          <Button title="Start het spel" onPress={handleStart} size="lg" />
         </View>
       </ScrollView>
     </ScreenContainer>
@@ -157,17 +163,30 @@ const styles = StyleSheet.create({
   scroll: {
     paddingBottom: Spacing.xxxl,
   },
+  headerBlock: {
+    marginTop: Spacing.md,
+    marginBottom: Spacing.xl,
+  },
+  overline: {
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: 12,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    marginBottom: Spacing.xs,
+  },
   header: {
     color: Colors.text,
-    fontSize: FontSize.xxxl,
-    fontWeight: '800',
-    marginBottom: Spacing.xl,
-    marginTop: Spacing.md,
+    fontFamily: Fonts.displayBold,
+    fontSize: 42,
+    letterSpacing: 0.5,
   },
   sectionLabel: {
     color: Colors.textSecondary,
-    fontSize: FontSize.md,
-    fontWeight: '600',
+    fontFamily: Fonts.sansBold,
+    fontSize: 12,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
     marginBottom: Spacing.sm,
     marginTop: Spacing.md,
   },
@@ -178,8 +197,8 @@ const styles = StyleSheet.create({
   },
   categoryCount: {
     color: Colors.textMuted,
-    fontSize: FontSize.xs,
-    fontWeight: '600',
+    fontFamily: Fonts.sansMedium,
+    fontSize: 12,
     marginBottom: Spacing.sm,
     marginTop: Spacing.md,
   },
@@ -201,23 +220,27 @@ const styles = StyleSheet.create({
     padding: Spacing.md,
     marginTop: Spacing.md,
     borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    borderColor: Colors.goldLine,
   },
   trollInfo: {
     flex: 1,
   },
   trollLabel: {
     color: Colors.text,
-    fontSize: FontSize.lg,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemi,
+    fontSize: 15,
   },
   trollDesc: {
     color: Colors.textMuted,
-    fontSize: FontSize.xs,
-    marginTop: 2,
+    fontFamily: Fonts.sans,
+    fontSize: 12,
+    marginTop: 3,
   },
   trollButton: {
-    width: 80,
+    width: 84,
+  },
+  divider: {
+    marginTop: Spacing.xl,
   },
   startButton: {
     marginTop: Spacing.xl,
