@@ -31,7 +31,6 @@ export default function RevealScreen() {
   }
 
   const isImposter = round.imposterIds.includes(currentPlayer.id);
-  const isTrollRound = round.trollRound === true;
   const playerIndex = players.findIndex((p) => p.id === currentPlayer.id);
   const color = PLAYER_COLORS[playerIndex % PLAYER_COLORS.length];
   const isLastPlayer = round.currentPlayerIndex >= players.length - 1;
@@ -98,7 +97,7 @@ export default function RevealScreen() {
       {/* Naamplaatje */}
       <View style={[styles.namePill, Platform.OS === 'web' && (GlassStyle as any)]}>
         <View style={[styles.nameDiamond, { backgroundColor: color }]} />
-        <Text style={styles.playerName}>{currentPlayer.name}</Text>
+        <Text style={styles.playerName} numberOfLines={1}>{currentPlayer.name}</Text>
       </View>
 
       {/* Card container */}
@@ -154,15 +153,19 @@ export default function RevealScreen() {
               >
                 Imposter
               </Text>
-              {isTrollRound ? (
-                <Text style={styles.trollText}>Plot twist: iedereen is de imposter.</Text>
-              ) : (
+              {/* Ook in een trollronde toont de kaart een gewone imposterkaart —
+                  de verrassing dat iedereen imposter was, valt pas op het uitslagscherm. */}
+              {round.hintsEnabled ? (
                 <>
                   <View style={styles.hintPill}>
                     <Text style={styles.hintPillText}>{round.imposterHint}</Text>
                   </View>
                   <Text style={styles.subText}>Dit is je enige aanwijzing. Bluf mee.</Text>
                 </>
+              ) : (
+                <Text style={styles.subText}>
+                  Geen hint deze ronde. Luister goed naar de anderen en bluf mee.
+                </Text>
               )}
             </View>
           ) : (
@@ -282,6 +285,7 @@ const styles = StyleSheet.create({
   },
   watermarkMark: {
     fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
     fontSize: 260,
     color: Colors.text,
   },
@@ -334,6 +338,7 @@ const styles = StyleSheet.create({
   imposterTitle: {
     color: Colors.imposter,
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 54,
     lineHeight: 62,
     letterSpacing: 1,
@@ -343,6 +348,7 @@ const styles = StyleSheet.create({
   secretWord: {
     color: Colors.text,
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 46,
     lineHeight: 56,
     letterSpacing: 1,
@@ -372,14 +378,6 @@ const styles = StyleSheet.create({
     fontSize: FontSize.md,
     letterSpacing: 0.5,
     textAlign: 'center',
-  },
-  trollText: {
-    color: Colors.textSecondary,
-    fontFamily: Fonts.sansMedium,
-    fontSize: FontSize.md,
-    marginTop: Spacing.lg,
-    textAlign: 'center',
-    lineHeight: 22,
   },
   subText: {
     color: Colors.textMuted,

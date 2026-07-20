@@ -122,6 +122,7 @@ const styles = StyleSheet.create({
   },
   voterName: {
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: FontSize.xxl + 8,
     lineHeight: (FontSize.xxl + 8) * 1.2,
     letterSpacing: 0.5,

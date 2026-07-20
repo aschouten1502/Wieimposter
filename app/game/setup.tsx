@@ -25,6 +25,7 @@ export default function SetupScreen() {
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['eten']);
   const [impostersCount, setImpostersCount] = useState(1);
   const [trollMode, setTrollMode] = useState(false);
+  const [hintsEnabled, setHintsEnabled] = useState(true);
 
   const handlePlayerCountChange = useCallback((count: number) => {
     setPlayerCount(count);
@@ -73,7 +74,7 @@ export default function SetupScreen() {
       return finalName;
     });
 
-    initGame(uniqueNames, selectedCategories, impostersCount, trollMode);
+    initGame(uniqueNames, selectedCategories, impostersCount, trollMode, hintsEnabled);
     router.replace('/game/pass');
   };
 
@@ -136,6 +137,21 @@ export default function SetupScreen() {
 
         <View style={[styles.trollRow, Platform.OS === 'web' && (GlassStyle as any)]}>
           <View style={styles.trollInfo}>
+            <Text style={styles.trollLabel}>Imposter-hint</Text>
+            <Text style={styles.trollDesc}>De imposter krijgt een vage aanwijzing</Text>
+          </View>
+          <Button
+            title={hintsEnabled ? 'AAN' : 'UIT'}
+            onPress={() => setHintsEnabled(!hintsEnabled)}
+            variant={hintsEnabled ? 'primary' : 'secondary'}
+            size="sm"
+            fullWidth={false}
+            style={styles.trollButton}
+          />
+        </View>
+
+        <View style={[styles.trollRow, Platform.OS === 'web' && (GlassStyle as any)]}>
+          <View style={styles.trollInfo}>
             <Text style={styles.trollLabel}>Trollmodus</Text>
             <Text style={styles.trollDesc}>Kans dat iedereen imposter is</Text>
           </View>
@@ -178,6 +194,7 @@ const styles = StyleSheet.create({
   header: {
     color: Colors.text,
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 42,
     letterSpacing: 0.5,
   },

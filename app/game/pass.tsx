@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
   },
   playerName: {
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 60,
     lineHeight: 70,
     letterSpacing: 1,
@@ -96,17 +97,18 @@ const styles = StyleSheet.create({
   progress: {
     marginTop: Spacing.xxl,
     backgroundColor: Colors.glass,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.sm + 2,
     borderRadius: BorderRadius.full,
     borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    borderColor: Colors.goldLine,
   },
   progressText: {
     color: Colors.textSecondary,
     fontFamily: Fonts.sansSemi,
-    fontSize: FontSize.sm,
-    letterSpacing: 0.5,
+    fontSize: FontSize.xs,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   buttonContainer: {
     width: '100%',

@@ -126,6 +126,7 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.xl,
     color: Colors.text,
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 40,
     lineHeight: 48,
     letterSpacing: 0.5,
@@ -142,12 +143,14 @@ const styles = StyleSheet.create({
   ruleNumber: {
     color: Colors.primary,
     fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
     fontSize: 30,
     lineHeight: 34,
   },
   ruleTitle: {
     color: Colors.text,
     fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
     fontSize: 24,
     letterSpacing: 0.5,
     marginBottom: Spacing.xs,

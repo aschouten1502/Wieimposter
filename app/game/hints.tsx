@@ -99,6 +99,7 @@ const styles = StyleSheet.create({
   title: {
     color: Colors.text,
     fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
     fontSize: FontSize.xxl,
     letterSpacing: 0.5,
     textAlign: 'center',

@@ -10,7 +10,7 @@ interface GameStore {
 
   // Setup
   setPlayers: (players: Player[]) => void;
-  initGame: (playerNames: string[], categoryIds: string[], impostersCount: number, trollMode: boolean) => void;
+  initGame: (playerNames: string[], categoryIds: string[], impostersCount: number, trollMode: boolean, hintsEnabled: boolean) => void;
 
   // Phase management
   setPhase: (phase: GamePhase) => void;
@@ -42,6 +42,7 @@ interface BuildRoundParams {
   categoryIds: string[];
   impostersCount: number;
   trollMode: boolean;
+  hintsEnabled: boolean;
   usedWords: string[];
 }
 
@@ -50,7 +51,7 @@ interface BuildRoundParams {
  * Existing player identity and score are preserved; role and hasRevealed reset.
  */
 function buildRound(params: BuildRoundParams): { players: Player[]; round: Round; word: string } {
-  const { categoryIds, impostersCount, trollMode, usedWords } = params;
+  const { categoryIds, impostersCount, trollMode, hintsEnabled, usedWords } = params;
   const result = getRandomWordFromCategories(categoryIds, usedWords);
 
   // Troll mode: 15% chance everyone becomes imposter
@@ -99,6 +100,7 @@ function buildRound(params: BuildRoundParams): { players: Player[]; round: Round
     currentVoterIndex: 0,
     trollModeEnabled: trollMode,
     trollRound: isTrollRound,
+    hintsEnabled,
   };
 
   return { players, round, word: result.word };
@@ -111,7 +113,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
   setPlayers: (players) => set({ players }),
 
-  initGame: (playerNames, categoryIds, impostersCount, trollMode) => {
+  initGame: (playerNames, categoryIds, impostersCount, trollMode, hintsEnabled) => {
     const { usedWords } = get();
 
     const basePlayers: Player[] = playerNames.map((name) => ({
@@ -127,6 +129,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       categoryIds,
       impostersCount,
       trollMode,
+      hintsEnabled,
       usedWords,
     });
 
@@ -274,6 +277,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
       categoryIds: round.categoryIds,
       impostersCount: round.originalImpostersCount,
       trollMode: round.trollModeEnabled,
+      hintsEnabled: round.hintsEnabled,
       usedWords,
     });
 

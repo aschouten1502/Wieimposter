@@ -85,6 +85,7 @@ const styles = StyleSheet.create({
   title: {
     color: Colors.text,
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 42,
     letterSpacing: 0.5,
   },

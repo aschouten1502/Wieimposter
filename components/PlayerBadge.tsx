@@ -36,7 +36,7 @@ export function PlayerBadge({
       ]}
     >
       <View style={[styles.diamond, { backgroundColor: color }]} />
-      <Text style={styles.name}>{name}</Text>
+      <Text style={styles.name} numberOfLines={1}>{name}</Text>
       {showRole && isImposter !== undefined && (
         <Text style={[styles.role, isImposter ? styles.roleImposter : styles.roleCivilian]}>
           {isImposter ? 'IMPOSTER' : 'BURGER'}

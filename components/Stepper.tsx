@@ -83,7 +83,6 @@ const styles = StyleSheet.create({
     height: 56,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Colors.surface,
   },
   buttonDisabled: {
     opacity: 0.35,
@@ -96,6 +95,7 @@ const styles = StyleSheet.create({
   value: {
     color: Colors.text,
     fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
     fontSize: 34,
     letterSpacing: 1,
   },

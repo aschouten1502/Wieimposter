@@ -75,6 +75,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
     color: Colors.text,
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 64,
     lineHeight: 72,
     letterSpacing: 2,

@@ -92,6 +92,7 @@ const styles = StyleSheet.create({
   title: {
     color: Colors.text,
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 42,
     letterSpacing: 0.5,
   },
@@ -125,6 +126,7 @@ const styles = StyleSheet.create({
   cardName: {
     color: Colors.text,
     fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
     fontSize: 26,
     letterSpacing: 0.5,
   },

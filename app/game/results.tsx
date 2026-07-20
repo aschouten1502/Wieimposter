@@ -372,6 +372,7 @@ const styles = StyleSheet.create({
   },
   resultTitle: {
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 40,
     lineHeight: 48,
     letterSpacing: 0.5,
@@ -403,6 +404,7 @@ const styles = StyleSheet.create({
   wordValue: {
     color: Colors.accent,
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: 40,
     lineHeight: 48,
     letterSpacing: 1,
@@ -434,6 +436,7 @@ const styles = StyleSheet.create({
   guessLabel: {
     color: Colors.text,
     fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
     fontSize: FontSize.xl,
     lineHeight: FontSize.xl * 1.25,
   },
@@ -469,6 +472,7 @@ const styles = StyleSheet.create({
   },
   guessResultText: {
     fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
     fontSize: FontSize.xl,
     lineHeight: FontSize.xl * 1.3,
     textAlign: 'center',
@@ -499,6 +503,7 @@ const styles = StyleSheet.create({
   scoreRank: {
     color: Colors.primary,
     fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
     fontSize: FontSize.lg,
     lineHeight: FontSize.lg * 1.2,
   },

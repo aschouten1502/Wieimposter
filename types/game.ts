@@ -51,6 +51,8 @@ export interface Round {
   currentVoterIndex: number;
   trollModeEnabled: boolean;
   trollRound: boolean;
+  /** Krijgt de imposter een vage aanwijzing te zien? Uit = hardcore bluffen. */
+  hintsEnabled: boolean;
 }
 
 export interface GameStats {

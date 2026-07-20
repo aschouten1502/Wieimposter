@@ -110,6 +110,7 @@ const styles = StyleSheet.create({
   },
   startName: {
     fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: FontSize.display,
     letterSpacing: 1,
     textAlign: 'center',
