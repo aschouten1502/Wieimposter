@@ -45,6 +45,10 @@ export interface Round {
   phase: GamePhase;
   roundResult: RoundResult | null;
   votedPlayerId: string | null;
+  /** voterId -> targetId, filled one by one during the secret voting flow. */
+  votes: Record<string, string>;
+  /** Index into getVoteOrder() of the player whose turn it is to vote. */
+  currentVoterIndex: number;
   trollModeEnabled: boolean;
   trollRound: boolean;
 }

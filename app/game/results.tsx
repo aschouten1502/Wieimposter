@@ -40,6 +40,18 @@ export default function ResultsScreen() {
     return players.filter((p) => round.imposterIds.includes(p.id));
   }, [players, round]);
 
+  const voteTally = useMemo(() => {
+    if (!round) return [];
+    const counts: Record<string, number> = {};
+    Object.values(round.votes).forEach((targetId) => {
+      counts[targetId] = (counts[targetId] ?? 0) + 1;
+    });
+    return players
+      .map((p, index) => ({ player: p, index, count: counts[p.id] ?? 0 }))
+      .filter((entry) => entry.count >= 1)
+      .sort((a, b) => b.count - a.count);
+  }, [players, round]);
+
   const scoreboard = useMemo(() => {
     return players
       .map((p) => ({ ...p, originalIndex: players.findIndex((pp) => pp.id === p.id) }))
@@ -166,7 +178,7 @@ export default function ResultsScreen() {
               </Animated.Text>
               <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.subLine}>
                 {nobodyVoted
-                  ? 'Niemand werd eruit gestemd — de imposter ontsnapt.'
+                  ? 'Gelijkspel — niemand werd weggestemd. De imposter ontsnapt.'
                   : 'De verkeerde persoon is eruit gestemd.'}
               </Animated.Text>
             </>
@@ -208,6 +220,21 @@ export default function ResultsScreen() {
               isImposter={round.imposterIds.includes(votedPlayer.id)}
               showRole={true}
             />
+          </Animated.View>
+        )}
+
+        {/* Vote Tally */}
+        {voteTally.length > 0 && (
+          <Animated.View entering={FadeInUp.duration(400).delay(950)} style={styles.section}>
+            <Text style={styles.sectionTitle}>Stemmen</Text>
+            {voteTally.map(({ player, index, count }) => (
+              <PlayerBadge
+                key={player.id}
+                name={player.name}
+                index={index}
+                voteCount={count}
+              />
+            ))}
           </Animated.View>
         )}
 

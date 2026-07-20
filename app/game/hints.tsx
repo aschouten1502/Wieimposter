@@ -11,7 +11,7 @@ export default function HintsScreen() {
   const router = useRouter();
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
-  const setPhase = useGameStore((s) => s.setPhase);
+  const startVoting = useGameStore((s) => s.startVoting);
   const [hintRound, setHintRound] = useState(1);
 
   if (!round) {
@@ -31,8 +31,8 @@ export default function HintsScreen() {
   };
 
   const handleDone = () => {
-    setPhase('voting');
-    router.replace('/game/vote');
+    startVoting();
+    router.replace('/game/vote-pass');
   };
 
   return (

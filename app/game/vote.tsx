@@ -1,14 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { PlayerBadge } from '@/components/PlayerBadge';
 import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { PLAYER_COLORS } from '@/constants/config';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
-
-const NONE = '__none__';
 
 export default function VoteScreen() {
   const router = useRouter();
@@ -17,69 +16,85 @@ export default function VoteScreen() {
 
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
-  const resolveVote = useGameStore((s) => s.resolveVote);
+  const getVoteOrder = useGameStore((s) => s.getVoteOrder);
+  const castVote = useGameStore((s) => s.castVote);
 
   if (!round) {
     router.replace('/');
     return null;
   }
 
+  const voteOrder = getVoteOrder();
+  const currentVoter =
+    round.phase === 'voting' && round.currentVoterIndex < voteOrder.length
+      ? voteOrder[round.currentVoterIndex]
+      : null;
+
+  if (!currentVoter) {
+    // Voting already finished (or state is stale) — nothing to do here.
+    if (round.phase === 'results') {
+      router.replace('/game/results');
+    } else {
+      router.replace('/');
+    }
+    return null;
+  }
+
+  const voterIndex = players.findIndex((p) => p.id === currentVoter.id);
+  const voterColor = PLAYER_COLORS[voterIndex % PLAYER_COLORS.length];
+  const candidates = players.filter((p) => p.id !== currentVoter.id);
+
   const handleConfirm = () => {
     if (!selectedId) return;
     haptics.heavy();
-    resolveVote(selectedId === NONE ? null : selectedId);
-    router.replace('/game/results');
+    castVote(selectedId);
+
+    const updatedRound = useGameStore.getState().round;
+    if (updatedRound?.phase === 'results') {
+      router.replace('/game/results');
+    } else {
+      router.replace('/game/vote-pass');
+    }
   };
 
   return (
     <ScreenContainer>
       <View style={[styles.header, Platform.OS === 'web' && (GlassStyle as any)]}>
         <Text style={styles.phase}>STEMMEN</Text>
-        <Text style={styles.emoji}>👆</Text>
-        <Text style={styles.title}>Wijs tegelijk aan!</Text>
+        <Text
+          style={[styles.voterName, { color: voterColor }]}
+          adjustsFontSizeToFit
+          numberOfLines={1}
+        >
+          {currentVoter.name}
+        </Text>
         <Text style={styles.subtitle}>
-          Tel af — 1, 2, 3 — en wijs allemaal tegelijk.{'\n'}
-          Kies wie de meeste vingers kreeg. Gelijkspel? Dan ontsnapt de imposter.
+          Wie is volgens jou de imposter?{'\n'}
+          Jouw stem blijft geheim.
         </Text>
       </View>
 
       <ScrollView style={styles.playerList} showsVerticalScrollIndicator={false}>
-        {players.map((player, index) => (
-          <PlayerBadge
-            key={player.id}
-            name={player.name}
-            index={index}
-            selected={selectedId === player.id}
-            onPress={() => {
-              haptics.light();
-              setSelectedId(player.id);
-            }}
-          />
-        ))}
-
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={() => {
-            haptics.light();
-            setSelectedId(NONE);
-          }}
-        >
-          <View
-            style={[
-              styles.noneRow,
-              selectedId === NONE && styles.noneRowSelected,
-              Platform.OS === 'web' && (GlassStyle as any),
-            ]}
-          >
-            <Text style={styles.noneEmoji}>🤝</Text>
-            <Text style={styles.noneText}>Gelijkspel / niemand eruit</Text>
-          </View>
-        </TouchableOpacity>
+        {candidates.map((player) => {
+          const originalIndex = players.findIndex((p) => p.id === player.id);
+          return (
+            <PlayerBadge
+              key={player.id}
+              name={player.name}
+              index={originalIndex}
+              selected={selectedId === player.id}
+              onPress={() => {
+                haptics.light();
+                setSelectedId(player.id);
+              }}
+            />
+          );
+        })}
       </ScrollView>
 
       <View style={styles.buttonContainer}>
         <Button
-          title="BEVESTIG"
+          title="STEM"
           onPress={handleConfirm}
           disabled={!selectedId}
           size="lg"
@@ -107,14 +122,12 @@ const styles = StyleSheet.create({
     letterSpacing: 3,
     marginBottom: Spacing.sm,
   },
-  emoji: {
-    fontSize: 48,
-    marginBottom: Spacing.sm,
-  },
-  title: {
-    color: Colors.text,
+  voterName: {
     fontSize: FontSize.xxl,
     fontWeight: '800',
+    textAlign: 'center',
+    width: '100%',
+    paddingHorizontal: Spacing.md,
   },
   subtitle: {
     color: Colors.textSecondary,
@@ -125,33 +138,6 @@ const styles = StyleSheet.create({
   },
   playerList: {
     flex: 1,
-  },
-  noneRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: Colors.glass,
-    borderRadius: BorderRadius.lg,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.md,
-    marginTop: Spacing.xs,
-    marginBottom: Spacing.sm,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
-    borderStyle: 'dashed',
-  },
-  noneRowSelected: {
-    borderColor: Colors.accent,
-    backgroundColor: Colors.surfaceLight,
-    borderStyle: 'solid',
-  },
-  noneEmoji: {
-    fontSize: FontSize.lg,
-    marginRight: Spacing.sm,
-  },
-  noneText: {
-    color: Colors.textSecondary,
-    fontSize: FontSize.lg,
-    fontWeight: '600',
   },
   buttonContainer: {
     paddingTop: Spacing.md,
