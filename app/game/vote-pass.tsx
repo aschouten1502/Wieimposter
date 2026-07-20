@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { PLAYER_COLORS } from '@/constants/config';
 
@@ -34,18 +34,28 @@ export default function VotePassScreen() {
   return (
     <ScreenContainer centered>
       <View style={styles.content}>
-        <Animated.Text entering={FadeIn.duration(300)} style={styles.instruction}>Geef de telefoon aan</Animated.Text>
+        <Animated.Text entering={FadeIn.duration(300)} style={styles.overline}>
+          Stemronde
+        </Animated.Text>
+        <Animated.Text entering={FadeIn.duration(400).delay(100)} style={styles.instruction}>
+          Geef de telefoon aan
+        </Animated.Text>
         <Animated.Text
           entering={FadeInDown.duration(500).delay(150)}
-          style={[styles.playerName, { color, textShadowColor: color + '40' }]}
+          style={[styles.playerName, { color }]}
           adjustsFontSizeToFit
           numberOfLines={1}
         >
           {currentVoter.name}
         </Animated.Text>
-        <Animated.Text entering={FadeIn.duration(400).delay(400)} style={styles.warning}>Stem in stilte — niemand mag meekijken.</Animated.Text>
+        <Animated.Text entering={FadeIn.duration(400).delay(400)} style={styles.warning}>
+          Stem in stilte — niemand mag meekijken.
+        </Animated.Text>
 
-        <Animated.View entering={FadeIn.duration(300).delay(500)} style={[styles.progress, Platform.OS === 'web' && (GlassStyle as any)]}>
+        <Animated.View
+          entering={FadeIn.duration(300).delay(500)}
+          style={[styles.progress, Platform.OS === 'web' && (GlassStyle as any)]}
+        >
           <Text style={styles.progressText}>
             Stem {round.currentVoterIndex + 1} van {voteOrder.length}
           </Text>
@@ -69,28 +79,36 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
+  overline: {
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: FontSize.xs,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    marginBottom: Spacing.md,
+  },
   instruction: {
     color: Colors.textSecondary,
+    fontFamily: Fonts.display,
     fontSize: FontSize.xl,
-    fontWeight: '300',
-    letterSpacing: 1,
+    letterSpacing: 0.5,
     marginBottom: Spacing.sm,
   },
   playerName: {
+    fontFamily: Fonts.displayBold,
     fontSize: FontSize.display,
-    fontWeight: '900',
-    letterSpacing: 2,
+    lineHeight: FontSize.display * 1.18,
+    letterSpacing: 1,
     textAlign: 'center',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
     width: '100%',
     paddingHorizontal: Spacing.md,
   },
   warning: {
     color: Colors.textMuted,
-    fontSize: FontSize.md,
+    fontFamily: Fonts.sans,
+    fontSize: FontSize.sm,
+    letterSpacing: 0.3,
     marginTop: Spacing.lg,
-    fontStyle: 'italic',
   },
   progress: {
     marginTop: Spacing.xxl,
@@ -99,12 +117,13 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.sm,
     borderRadius: BorderRadius.full,
     borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    borderColor: Colors.goldLine,
   },
   progressText: {
     color: Colors.textSecondary,
+    fontFamily: Fonts.sansSemi,
     fontSize: FontSize.sm,
-    fontWeight: '600',
+    letterSpacing: 0.5,
   },
   buttonContainer: {
     width: '100%',

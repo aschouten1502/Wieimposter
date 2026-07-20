@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { PlayerBadge } from '@/components/PlayerBadge';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { OrnamentDivider } from '@/components/Ornaments';
+import { Colors, Fonts, Spacing, FontSize } from '@/constants/theme';
 import { PLAYER_COLORS } from '@/constants/config';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -59,8 +60,8 @@ export default function VoteScreen() {
 
   return (
     <ScreenContainer>
-      <View style={[styles.header, Platform.OS === 'web' && (GlassStyle as any)]}>
-        <Text style={styles.phase}>STEMMEN</Text>
+      <View style={styles.header}>
+        <Text style={styles.overline}>Stem in stilte</Text>
         <Text
           style={[styles.voterName, { color: voterColor }]}
           adjustsFontSizeToFit
@@ -70,8 +71,9 @@ export default function VoteScreen() {
         </Text>
         <Text style={styles.subtitle}>
           Wie is volgens jou de imposter?{'\n'}
-          Jouw stem blijft geheim.
+          Niemand ziet jouw keuze.
         </Text>
+        <OrnamentDivider style={styles.divider} />
       </View>
 
       <ScrollView style={styles.playerList} showsVerticalScrollIndicator={false}>
@@ -107,34 +109,37 @@ export default function VoteScreen() {
 const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
-    marginTop: Spacing.md,
+    marginTop: Spacing.lg,
     marginBottom: Spacing.lg,
-    backgroundColor: Colors.glass,
-    borderRadius: BorderRadius.xl,
-    padding: Spacing.lg,
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
   },
-  phase: {
-    color: Colors.accent,
-    fontSize: FontSize.sm,
-    fontWeight: '800',
+  overline: {
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: FontSize.xs,
     letterSpacing: 3,
+    textTransform: 'uppercase',
     marginBottom: Spacing.sm,
   },
   voterName: {
-    fontSize: FontSize.xxl,
-    fontWeight: '800',
+    fontFamily: Fonts.displayBold,
+    fontSize: FontSize.xxl + 8,
+    lineHeight: (FontSize.xxl + 8) * 1.2,
+    letterSpacing: 0.5,
     textAlign: 'center',
     width: '100%',
     paddingHorizontal: Spacing.md,
   },
   subtitle: {
     color: Colors.textSecondary,
-    fontSize: FontSize.md,
+    fontFamily: Fonts.sans,
+    fontSize: FontSize.sm,
     textAlign: 'center',
     marginTop: Spacing.sm,
     lineHeight: 22,
+  },
+  divider: {
+    marginTop: Spacing.lg,
+    marginHorizontal: Spacing.xl,
   },
   playerList: {
     flex: 1,
