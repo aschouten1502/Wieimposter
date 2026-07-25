@@ -4,7 +4,8 @@ import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { CornerFrame } from '@/components/Ornaments';
+import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { PLAYER_COLORS } from '@/constants/config';
 
@@ -34,12 +35,16 @@ export default function HintStartScreen() {
     <ScreenContainer centered>
       <View style={styles.content}>
         <Animated.Text entering={FadeIn.duration(400)} style={styles.allRevealed}>
-          Iedereen heeft zijn kaart gezien!
+          Iedereen heeft zijn kaart gezien.
         </Animated.Text>
 
-        <Animated.View entering={FadeInDown.duration(500).delay(300)} style={[styles.startBox, Platform.OS === 'web' && (GlassStyle as any)]}>
+        <Animated.View
+          entering={FadeInDown.duration(500).delay(300)}
+          style={[styles.startBox, Platform.OS === 'web' && (GlassStyle as any)]}
+        >
+          <CornerFrame inset={8} size={14} />
           <Text style={styles.startLabel}>BEGINT MET HINTS</Text>
-          <View style={[styles.nameDot, { backgroundColor: color }]} />
+          <View style={[styles.nameDiamond, { backgroundColor: color }]} />
           <Text
             style={[styles.startName, { color }]}
             adjustsFontSizeToFit
@@ -50,7 +55,7 @@ export default function HintStartScreen() {
         </Animated.View>
 
         <Animated.Text entering={FadeIn.duration(400).delay(600)} style={styles.hint}>
-          Geef om de beurt 2 woorden als hint
+          Geef om de beurt één woord als hint.
         </Animated.Text>
       </View>
 
@@ -73,46 +78,48 @@ const styles = StyleSheet.create({
   },
   allRevealed: {
     color: Colors.textSecondary,
-    fontSize: FontSize.lg,
-    fontWeight: '300',
-    letterSpacing: 1,
+    fontFamily: Fonts.sans,
+    fontSize: FontSize.md,
+    letterSpacing: 0.5,
     marginBottom: Spacing.xxl,
   },
   startBox: {
     alignItems: 'center',
+    alignSelf: 'stretch',
     backgroundColor: Colors.glass,
-    borderRadius: BorderRadius.xxl,
+    borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    borderColor: Colors.glassBorder,
-    paddingHorizontal: Spacing.xxl,
-    paddingVertical: Spacing.xl,
+    borderColor: Colors.goldLine,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.xxl,
     marginBottom: Spacing.xl,
   },
   startLabel: {
-    color: Colors.accent,
-    fontSize: FontSize.sm,
-    fontWeight: '800',
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: FontSize.xs,
     letterSpacing: 3,
+    textTransform: 'uppercase',
+    marginBottom: Spacing.lg,
+  },
+  nameDiamond: {
+    width: 10,
+    height: 10,
+    transform: [{ rotate: '45deg' }],
     marginBottom: Spacing.md,
   },
-  nameDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    marginBottom: Spacing.sm,
-  },
   startName: {
+    fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
     fontSize: FontSize.display,
-    fontWeight: '900',
-    letterSpacing: 2,
+    letterSpacing: 1,
     textAlign: 'center',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
   },
   hint: {
     color: Colors.textMuted,
+    fontFamily: Fonts.sans,
     fontSize: FontSize.md,
-    fontStyle: 'italic',
+    textAlign: 'center',
   },
   buttonContainer: {
     width: '100%',

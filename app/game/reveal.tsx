@@ -3,7 +3,9 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated, Platform } from 're
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { CornerFrame, Medallion, PatternBackdrop } from '@/components/Ornaments';
+import { IconEye, IconMask } from '@/components/icons';
+import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { useHaptics } from '@/hooks/useHaptics';
 import { PLAYER_COLORS } from '@/constants/config';
@@ -29,7 +31,6 @@ export default function RevealScreen() {
   }
 
   const isImposter = round.imposterIds.includes(currentPlayer.id);
-  const isTrollRound = round.trollRound === true;
   const playerIndex = players.findIndex((p) => p.id === currentPlayer.id);
   const color = PLAYER_COLORS[playerIndex % PLAYER_COLORS.length];
   const isLastPlayer = round.currentPlayerIndex >= players.length - 1;
@@ -82,12 +83,21 @@ export default function RevealScreen() {
 
   const roleColor = isImposter ? Colors.imposter : Colors.civilian;
 
+  // Gedeeld kaartchroom: watermerk, binnenkader en hoektikjes.
+  const cardChrome = (
+    <>
+      <PatternBackdrop opacity={0.03} />
+      <View pointerEvents="none" style={styles.innerFrame} />
+      <CornerFrame inset={18} size={14} />
+    </>
+  );
+
   return (
     <ScreenContainer centered>
-      {/* Player name pill */}
+      {/* Naamplaatje */}
       <View style={[styles.namePill, Platform.OS === 'web' && (GlassStyle as any)]}>
-        <View style={[styles.nameDot, { backgroundColor: color }]} />
-        <Text style={[styles.playerName, { color }]}>{currentPlayer.name}</Text>
+        <View style={[styles.nameDiamond, { backgroundColor: color }]} />
+        <Text style={styles.playerName} numberOfLines={1}>{currentPlayer.name}</Text>
       </View>
 
       {/* Card container */}
@@ -97,7 +107,6 @@ export default function RevealScreen() {
           style={[
             styles.card,
             styles.cardFront,
-            Platform.OS === 'web' && (GlassStyle as any),
             { transform: [{ perspective: 1000 }, { rotateY: frontInterpolate }], opacity: frontOpacity },
           ]}
         >
@@ -107,13 +116,16 @@ export default function RevealScreen() {
             activeOpacity={0.9}
             disabled={revealed}
           >
-            <View style={styles.cardPattern}>
-              <Text style={styles.cardQuestionMark}>?</Text>
+            {cardChrome}
+            <View pointerEvents="none" style={styles.watermark}>
+              <Text style={styles.watermarkMark}>?</Text>
             </View>
             <View style={styles.cardFrontContent}>
-              <Text style={styles.tapIcon}>👁️</Text>
-              <Text style={styles.tapText}>TAP OM TE ONTHULLEN</Text>
-              <Text style={styles.tapHint}>Houd je scherm verborgen!</Text>
+              <Medallion size={116}>
+                <IconEye size={36} color={Colors.text} />
+              </Medallion>
+              <Text style={styles.frontOverline}>TIK OM TE ONTHULLEN</Text>
+              <Text style={styles.frontSub}>Houd je scherm verborgen.</Text>
             </View>
           </TouchableOpacity>
         </Animated.View>
@@ -123,42 +135,51 @@ export default function RevealScreen() {
           style={[
             styles.card,
             styles.cardBack,
-            Platform.OS === 'web' && (GlassStyle as any),
-            { borderColor: roleColor },
             { transform: [{ perspective: 1000 }, { rotateY: backInterpolate }], opacity: backOpacity },
           ]}
         >
+          {cardChrome}
           <View style={[styles.roleGlow, { shadowColor: roleColor }]} />
           {isImposter ? (
             <View style={styles.roleContent}>
-              <Text style={styles.roleEmoji}>🕵️</Text>
-              <Text style={styles.roleLabel}>JIJ BENT DE</Text>
-              <Text style={[styles.roleTitle, { color: Colors.imposter }]}>IMPOSTER</Text>
-              {isTrollRound ? (
-                <View style={styles.hintBox}>
-                  <Text style={styles.hintText}>Plot twist: iedereen is imposter!</Text>
-                </View>
-              ) : (
+              <Medallion size={104}>
+                <IconMask size={38} color={Colors.imposter} />
+              </Medallion>
+              <Text style={styles.backOverline}>JIJ BENT DE</Text>
+              <Text
+                style={styles.imposterTitle}
+                adjustsFontSizeToFit
+                numberOfLines={1}
+              >
+                Imposter
+              </Text>
+              {/* Ook in een trollronde toont de kaart een gewone imposterkaart —
+                  de verrassing dat iedereen imposter was, valt pas op het uitslagscherm. */}
+              {round.hintsEnabled ? (
                 <>
-                  <View style={styles.categoryPill}>
-                    <Text style={styles.categoryText}>{round.imposterHint}</Text>
+                  <View style={styles.hintPill}>
+                    <Text style={styles.hintPillText}>{round.imposterHint}</Text>
                   </View>
-                  <View style={styles.hintBox}>
-                    <Text style={styles.hintText}>Dit is je enige aanwijzing. Bluf mee!</Text>
-                  </View>
+                  <Text style={styles.subText}>Dit is je enige aanwijzing. Bluf mee.</Text>
                 </>
+              ) : (
+                <Text style={styles.subText}>
+                  Geen hint deze ronde. Luister goed naar de anderen en bluf mee.
+                </Text>
               )}
             </View>
           ) : (
             <View style={styles.roleContent}>
-              <Text style={styles.roleEmoji}>✅</Text>
-              <Text style={styles.civilianLabel}>Je bent een burger</Text>
-              <View style={styles.wordContainer}>
-                <Text style={styles.secretWord}>{round.secretWord}</Text>
-              </View>
-              <View style={styles.hintBox}>
-                <Text style={styles.hintText}>Geef subtiele hints zonder het weg te geven</Text>
-              </View>
+              <Text style={styles.backOverline}>JOUW WOORD</Text>
+              <Text
+                style={styles.secretWord}
+                adjustsFontSizeToFit
+                numberOfLines={1}
+              >
+                {round.secretWord}
+              </Text>
+              <View style={styles.jadeHairline} />
+              <Text style={styles.subText}>Geef straks één woord als hint — subtiel.</Text>
             </View>
           )}
         </Animated.View>
@@ -192,16 +213,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.glassBorder,
   },
-  nameDot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
+  nameDiamond: {
+    width: 9,
+    height: 9,
     marginRight: Spacing.sm,
+    transform: [{ rotate: '45deg' }],
   },
   playerName: {
-    fontSize: FontSize.xl,
-    fontWeight: '800',
-    letterSpacing: 2,
+    color: Colors.text,
+    fontFamily: Fonts.sansSemi,
+    fontSize: FontSize.md,
+    letterSpacing: 1,
   },
   cardWrapper: {
     flex: 1,
@@ -214,11 +236,21 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 0.65,
     borderRadius: BorderRadius.xxl,
-    borderWidth: 1.5,
-    borderColor: Colors.glassBorder,
-    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.goldLine,
+    backgroundColor: Colors.inkDeep,
     overflow: 'hidden',
     backfaceVisibility: 'hidden',
+  },
+  innerFrame: {
+    position: 'absolute',
+    top: 10,
+    left: 10,
+    right: 10,
+    bottom: 10,
+    borderWidth: 1,
+    borderColor: Colors.borderLight,
+    borderRadius: BorderRadius.xxl - 10,
   },
   cardFront: {
     position: 'absolute',
@@ -241,7 +273,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  cardPattern: {
+  watermark: {
     position: 'absolute',
     top: 0,
     left: 0,
@@ -249,30 +281,33 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    opacity: 0.04,
+    opacity: 0.05,
   },
-  cardQuestionMark: {
-    fontSize: 280,
-    fontWeight: '900',
+  watermarkMark: {
+    fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
+    fontSize: 260,
     color: Colors.text,
   },
   cardFrontContent: {
     alignItems: 'center',
+    paddingHorizontal: Spacing.xl,
   },
-  tapIcon: {
-    fontSize: 56,
-    marginBottom: Spacing.lg,
+  frontOverline: {
+    color: Colors.accent,
+    fontFamily: Fonts.sansBold,
+    fontSize: 13,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    marginTop: Spacing.xl,
+    textAlign: 'center',
   },
-  tapText: {
-    color: Colors.text,
-    fontSize: FontSize.lg,
-    fontWeight: '700',
-    letterSpacing: 2,
-  },
-  tapHint: {
+  frontSub: {
     color: Colors.textMuted,
+    fontFamily: Fonts.sans,
     fontSize: FontSize.sm,
     marginTop: Spacing.sm,
+    textAlign: 'center',
   },
   roleGlow: {
     position: 'absolute',
@@ -282,71 +317,73 @@ const styles = StyleSheet.create({
     bottom: '20%',
     borderRadius: 200,
     shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.35,
     shadowRadius: 60,
     elevation: 0,
   },
   roleContent: {
     alignItems: 'center',
     paddingHorizontal: Spacing.xl,
+    width: '100%',
   },
-  roleEmoji: {
-    fontSize: 72,
-    marginBottom: Spacing.md,
+  backOverline: {
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: FontSize.xs,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    marginTop: Spacing.lg,
+    textAlign: 'center',
   },
-  roleLabel: {
-    color: Colors.textSecondary,
-    fontSize: FontSize.lg,
-    fontWeight: '600',
+  imposterTitle: {
+    color: Colors.imposter,
+    fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
+    fontSize: 54,
+    lineHeight: 62,
     letterSpacing: 1,
-  },
-  roleTitle: {
-    fontSize: FontSize.display,
-    fontWeight: '900',
-    letterSpacing: 4,
-  },
-  civilianLabel: {
-    color: Colors.civilian,
-    fontSize: FontSize.xl,
-    fontWeight: '700',
-    marginBottom: Spacing.lg,
-  },
-  wordContainer: {
-    backgroundColor: Colors.glass,
-    borderRadius: BorderRadius.xl,
-    paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.glassBorder,
-    marginBottom: Spacing.md,
+    marginTop: Spacing.xs,
+    textAlign: 'center',
   },
   secretWord: {
     color: Colors.text,
-    fontSize: FontSize.xxxl,
-    fontWeight: '900',
-    letterSpacing: 2,
+    fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
+    fontSize: 46,
+    lineHeight: 56,
+    letterSpacing: 1,
+    marginTop: Spacing.md,
     textAlign: 'center',
+    width: '100%',
   },
-  categoryPill: {
+  jadeHairline: {
+    width: 56,
+    height: 1,
+    backgroundColor: Colors.civilian,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  hintPill: {
     backgroundColor: Colors.accentGlow,
     borderRadius: BorderRadius.full,
     paddingHorizontal: Spacing.lg,
     paddingVertical: Spacing.sm,
     marginTop: Spacing.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 215, 0, 0.3)',
+    borderColor: Colors.goldLine,
   },
-  categoryText: {
+  hintPillText: {
     color: Colors.accent,
+    fontFamily: Fonts.sansSemi,
     fontSize: FontSize.md,
-    fontWeight: '700',
+    letterSpacing: 0.5,
+    textAlign: 'center',
   },
-  hintBox: {
-    marginTop: Spacing.md,
-  },
-  hintText: {
+  subText: {
     color: Colors.textMuted,
+    fontFamily: Fonts.sans,
     fontSize: FontSize.sm,
+    marginTop: Spacing.md,
     textAlign: 'center',
     lineHeight: 20,
   },

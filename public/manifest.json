@@ -4,7 +4,7 @@
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#0A0A1A",
-  "theme_color": "#0A0A1A",
+  "background_color": "#0A1412",
+  "theme_color": "#0A1412",
   "description": "Wie is de imposter? Een party game voor vrienden!"
 }

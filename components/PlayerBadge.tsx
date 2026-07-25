@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { PLAYER_COLORS } from '@/constants/config';
 
 interface PlayerBadgeProps {
@@ -35,8 +35,8 @@ export function PlayerBadge({
         Platform.OS === 'web' && (GlassStyle as any),
       ]}
     >
-      <View style={[styles.dot, { backgroundColor: color, shadowColor: color }]} />
-      <Text style={styles.name}>{name}</Text>
+      <View style={[styles.diamond, { backgroundColor: color }]} />
+      <Text style={styles.name} numberOfLines={1}>{name}</Text>
       {showRole && isImposter !== undefined && (
         <Text style={[styles.role, isImposter ? styles.roleImposter : styles.roleCivilian]}>
           {isImposter ? 'IMPOSTER' : 'BURGER'}
@@ -75,30 +75,31 @@ const styles = StyleSheet.create({
   },
   badgeSelected: {
     borderColor: Colors.primary,
-    backgroundColor: Colors.surfaceLight,
+    backgroundColor: Colors.accentGlow,
   },
   badgeDisabled: {
     opacity: 0.4,
   },
-  dot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: Spacing.sm,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.6,
-    shadowRadius: 6,
+  diamond: {
+    width: 10,
+    height: 10,
+    marginLeft: 2,
+    marginRight: Spacing.md,
+    transform: [{ rotate: '45deg' }],
   },
   name: {
     color: Colors.text,
-    fontSize: FontSize.lg,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemi,
+    fontSize: 17,
+    letterSpacing: 0.3,
     flex: 1,
   },
   role: {
-    fontSize: FontSize.xs,
-    fontWeight: '800',
-    letterSpacing: 1,
+    fontFamily: Fonts.sansBold,
+    fontSize: 11,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginLeft: Spacing.sm,
   },
   roleImposter: {
     color: Colors.imposter,
@@ -109,14 +110,15 @@ const styles = StyleSheet.create({
   voteBadge: {
     backgroundColor: Colors.primary,
     borderRadius: BorderRadius.full,
-    width: 28,
-    height: 28,
+    width: 26,
+    height: 26,
     alignItems: 'center',
     justifyContent: 'center',
+    marginLeft: Spacing.sm,
   },
   voteCount: {
-    color: Colors.text,
-    fontSize: FontSize.sm,
-    fontWeight: '800',
+    color: Colors.inkDeep,
+    fontFamily: Fonts.sansExtra,
+    fontSize: 13,
   },
 });

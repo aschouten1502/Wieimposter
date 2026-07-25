@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { PLAYER_COLORS } from '@/constants/config';
 
@@ -26,25 +26,32 @@ export default function PassScreen() {
   return (
     <ScreenContainer centered>
       <View style={styles.content}>
-        <Animated.Text entering={FadeIn.duration(300)} style={styles.instruction}>Geef de telefoon aan</Animated.Text>
+        <Animated.Text entering={FadeIn.duration(400)} style={styles.overline}>
+          GEEF DE TELEFOON AAN
+        </Animated.Text>
         <Animated.Text
-          entering={FadeInDown.duration(500).delay(150)}
-          style={[styles.playerName, { color, textShadowColor: color + '40' }]}
+          entering={FadeInDown.duration(500).delay(120)}
+          style={[styles.playerName, { color, textShadowColor: color + '55' }]}
           adjustsFontSizeToFit
           numberOfLines={1}
         >
           {currentPlayer.name}
         </Animated.Text>
-        <Animated.Text entering={FadeIn.duration(400).delay(400)} style={styles.warning}>Zorg dat niemand meekijkt!</Animated.Text>
+        <Animated.Text entering={FadeIn.duration(400).delay(320)} style={styles.sub}>
+          Zorg dat niemand meekijkt.
+        </Animated.Text>
 
-        <Animated.View entering={FadeIn.duration(300).delay(500)} style={[styles.progress, Platform.OS === 'web' && (GlassStyle as any)]}>
+        <Animated.View
+          entering={FadeIn.duration(400).delay(450)}
+          style={[styles.progress, Platform.OS === 'web' && (GlassStyle as any)]}
+        >
           <Text style={styles.progressText}>
             Speler {round.currentPlayerIndex + 1} van {players.length}
           </Text>
         </Animated.View>
       </View>
 
-      <Animated.View entering={FadeInUp.duration(400).delay(600)} style={styles.buttonContainer}>
+      <Animated.View entering={FadeInUp.duration(500).delay(550)} style={styles.buttonContainer}>
         <Button
           title="IK BEN KLAAR"
           onPress={() => router.replace('/game/reveal')}
@@ -61,42 +68,47 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
   },
-  instruction: {
-    color: Colors.textSecondary,
-    fontSize: FontSize.xl,
-    fontWeight: '300',
-    letterSpacing: 1,
-    marginBottom: Spacing.sm,
+  overline: {
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: FontSize.xs,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    marginBottom: Spacing.md,
   },
   playerName: {
-    fontSize: FontSize.display,
-    fontWeight: '900',
-    letterSpacing: 2,
+    fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
+    fontSize: 60,
+    lineHeight: 70,
+    letterSpacing: 1,
     textAlign: 'center',
     textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 20,
+    textShadowRadius: 24,
     width: '100%',
     paddingHorizontal: Spacing.md,
   },
-  warning: {
+  sub: {
     color: Colors.textMuted,
+    fontFamily: Fonts.sans,
     fontSize: FontSize.md,
     marginTop: Spacing.lg,
-    fontStyle: 'italic',
   },
   progress: {
     marginTop: Spacing.xxl,
     backgroundColor: Colors.glass,
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.sm + 2,
     borderRadius: BorderRadius.full,
     borderWidth: 1,
-    borderColor: Colors.glassBorder,
+    borderColor: Colors.goldLine,
   },
   progressText: {
     color: Colors.textSecondary,
-    fontSize: FontSize.sm,
-    fontWeight: '600',
+    fontFamily: Fonts.sansSemi,
+    fontSize: FontSize.xs,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   buttonContainer: {
     width: '100%',

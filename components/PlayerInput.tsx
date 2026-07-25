@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, TextInput, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { View, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { Colors, Fonts, Spacing, BorderRadius, GlassStyle } from '@/constants/theme';
 import { PLAYER_COLORS } from '@/constants/config';
+import { IconCross } from '@/components/icons';
 
 interface PlayerInputProps {
   index: number;
@@ -28,7 +29,7 @@ export function PlayerInput({ index, value, onChange, onRemove, showRemove }: Pl
       />
       {showRemove && (
         <TouchableOpacity onPress={onRemove} style={styles.removeButton} activeOpacity={0.7}>
-          <Text style={styles.removeText}>✕</Text>
+          <IconCross size={16} color={Colors.textMuted} />
         </TouchableOpacity>
       )}
     </View>
@@ -47,22 +48,20 @@ const styles = StyleSheet.create({
     borderColor: Colors.borderLight,
   },
   indicator: {
-    width: 4,
-    height: '100%',
+    width: 9,
+    height: 9,
+    marginLeft: Spacing.md,
+    transform: [{ rotate: '45deg' }],
   },
   input: {
     flex: 1,
     color: Colors.text,
-    fontSize: FontSize.lg,
+    fontFamily: Fonts.sansMedium,
+    fontSize: 16,
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.md,
-    fontWeight: '500',
   },
   removeButton: {
     padding: Spacing.md,
-  },
-  removeText: {
-    color: Colors.textMuted,
-    fontSize: FontSize.lg,
   },
 });

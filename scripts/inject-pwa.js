@@ -5,7 +5,7 @@ const htmlPath = path.join(__dirname, '..', 'dist', 'index.html');
 let html = fs.readFileSync(htmlPath, 'utf8');
 
 const pwaTags = `
-    <meta name="theme-color" content="#0D0D0D" />
+    <meta name="theme-color" content="#0A1412" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="Imposter" />

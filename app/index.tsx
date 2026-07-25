@@ -3,18 +3,25 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
-import { Colors, Spacing, FontSize } from '@/constants/theme';
+import { Medallion, OrnamentDivider } from '@/components/Ornaments';
+import { IconMask } from '@/components/icons';
+import { Colors, Fonts, Spacing } from '@/constants/theme';
 
 export default function HomeScreen() {
   const router = useRouter();
 
   return (
     <ScreenContainer centered>
-      <View style={styles.logoContainer}>
-        <Text style={styles.emoji}>🕵️</Text>
-        <Text style={styles.title}>WHO'S THE</Text>
-        <Text style={styles.titleAccent} adjustsFontSizeToFit numberOfLines={1}>IMPOSTER</Text>
-        <Text style={styles.subtitle}>De ultieme party game</Text>
+      <View style={styles.brand}>
+        <Medallion size={116}>
+          <IconMask size={46} color={Colors.primary} />
+        </Medallion>
+        <Text style={styles.overline}>HET GEZELSCHAPSSPEL</Text>
+        <Text style={styles.title} adjustsFontSizeToFit numberOfLines={1}>
+          IMPOSTER
+        </Text>
+        <OrnamentDivider style={styles.divider} />
+        <Text style={styles.tagline}>Wie bluft er aan tafel?</Text>
       </View>
 
       <View style={styles.buttons}>
@@ -51,35 +58,41 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  logoContainer: {
+  brand: {
+    width: '100%',
     alignItems: 'center',
-    marginBottom: Spacing.xxxl,
+    marginBottom: Spacing.xxl,
   },
-  emoji: {
-    fontSize: 80,
-    marginBottom: Spacing.md,
+  overline: {
+    marginTop: Spacing.xl,
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: 12,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
   },
   title: {
-    color: Colors.textSecondary,
-    fontSize: FontSize.xxl,
-    fontWeight: '300',
-    letterSpacing: 6,
-  },
-  titleAccent: {
-    color: Colors.primary,
-    fontSize: FontSize.display,
-    fontWeight: '900',
-    letterSpacing: 6,
-    marginTop: -4,
-    textShadowColor: Colors.primaryGlow,
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 30,
-  },
-  subtitle: {
-    color: Colors.textMuted,
-    fontSize: FontSize.md,
-    marginTop: Spacing.md,
+    marginTop: Spacing.sm,
+    color: Colors.text,
+    fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
+    fontSize: 64,
+    lineHeight: 72,
     letterSpacing: 2,
+    textAlign: 'center',
+    maxWidth: '100%',
+  },
+  divider: {
+    alignSelf: 'center',
+    width: 220,
+    marginTop: Spacing.md,
+    marginBottom: Spacing.md,
+  },
+  tagline: {
+    color: Colors.textMuted,
+    fontFamily: Fonts.sans,
+    fontSize: 15,
+    letterSpacing: 1,
   },
   buttons: {
     width: '100%',

@@ -1,34 +1,56 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
-import { Colors, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
+import { GlassCard } from '@/components/GlassCard';
+import {
+  IconChevronLeft,
+  IconEye,
+  IconProps,
+  IconQuestion,
+  IconSparkle,
+  IconTrophy,
+  IconUsers,
+  IconVote,
+} from '@/components/icons';
+import { Colors, Fonts, Spacing } from '@/constants/theme';
 
-const RULES = [
+interface Rule {
+  Icon: React.ComponentType<IconProps>;
+  title: string;
+  description: string;
+}
+
+const RULES: Rule[] = [
   {
-    emoji: '👥',
+    Icon: IconUsers,
     title: 'Rollen verdelen',
-    description: 'Geef de telefoon door zodat iedereen privé zijn rol ziet. Burgers of imposter!',
+    description:
+      'De telefoon gaat rond en iedereen bekijkt privé zijn rol. Houd je scherm verborgen voor de rest.',
   },
   {
-    emoji: '🔤',
+    Icon: IconEye,
     title: 'Het geheime woord',
-    description: 'Burgers kennen het geheime woord. De imposter weet niet welk woord het is!',
+    description:
+      'De burgers kennen het geheime woord. De imposter krijgt alleen een vage hint en moet zich staande houden.',
   },
   {
-    emoji: '💡',
+    Icon: IconQuestion,
     title: 'Hints geven',
-    description: 'Geef om de beurt 2 woorden als hint in de groep. Wees subtiel genoeg zodat de imposter het niet raadt!',
+    description:
+      'Om de beurt geef je één woord als hint, in de aangegeven volgorde. Verraad het woord niet, maar laat merken dat je het kent.',
   },
   {
-    emoji: '👉',
-    title: 'Wijzen',
-    description: 'Tel tot 3 en wijs tegelijk naar wie jij denkt dat de imposter is. De persoon met de meeste stemmen vliegt eruit!',
+    Icon: IconVote,
+    title: 'Stemmen',
+    description:
+      'Daarna stemt iedereen geheim via de telefoon, in dezelfde volgorde als de hints. Bij gelijkspel ontsnapt de imposter.',
   },
   {
-    emoji: '🏆',
+    Icon: IconTrophy,
     title: 'Winnen',
-    description: 'Burgers winnen als de imposter wordt gevonden. De imposter wint door niet ontmaskerd te worden, of door het woord te raden als laatste kans!',
+    description:
+      'De burgers winnen als de imposter wordt weggestemd. De imposter wint bij ontsnappen — of door na ontmaskering het woord alsnog te raden.',
   },
 ];
 
@@ -39,33 +61,34 @@ export default function HowToPlayScreen() {
     <ScreenContainer>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <Text style={styles.backText}>← Terug</Text>
+          <IconChevronLeft size={16} color={Colors.textSecondary} />
+          <Text style={styles.backText}>Terug</Text>
         </TouchableOpacity>
 
-        <Text style={styles.title}>Hoe te Spelen</Text>
+        <Text style={styles.overline}>UITLEG</Text>
+        <Text style={styles.title}>De spelregels</Text>
 
         {RULES.map((rule, index) => (
-          <View
-            key={index}
-            style={[styles.ruleCard, Platform.OS === 'web' && (GlassStyle as any)]}
-          >
+          <GlassCard key={rule.title} intensity="light" style={styles.ruleCard}>
             <View style={styles.ruleHeader}>
-              <Text style={styles.ruleEmoji}>{rule.emoji}</Text>
-              <View style={styles.ruleNumber}>
-                <Text style={styles.ruleNumberText}>{index + 1}</Text>
-              </View>
+              <rule.Icon size={26} color={Colors.primary} />
+              <Text style={styles.ruleNumber}>{index + 1}</Text>
             </View>
             <Text style={styles.ruleTitle}>{rule.title}</Text>
             <Text style={styles.ruleDescription}>{rule.description}</Text>
-          </View>
+          </GlassCard>
         ))}
 
-        <View style={[styles.tipCard, Platform.OS === 'web' && (GlassStyle as any)]}>
-          <Text style={styles.tipTitle}>💡 Pro tip</Text>
+        <GlassCard intensity="light" style={styles.tipCard}>
+          <View style={styles.tipHeader}>
+            <IconSparkle size={18} color={Colors.primary} />
+            <Text style={styles.tipTitle}>PRO-TIP</Text>
+          </View>
           <Text style={styles.tipText}>
-            Als imposter: probeer hints te geven die vaag genoeg zijn om niet op te vallen, maar specifiek genoeg om verdacht over te komen als burger.
+            Als imposter: luister goed naar de hints vóór jou en beweeg mee. Blijf vaag genoeg om
+            niet op te vallen, maar net specifiek genoeg om voor burger door te gaan.
           </Text>
-        </View>
+        </GlassCard>
       </ScrollView>
     </ScreenContainer>
   );
@@ -76,84 +99,90 @@ const styles = StyleSheet.create({
     paddingBottom: Spacing.xxxl,
   },
   backButton: {
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
     marginTop: Spacing.md,
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.lg,
+    paddingVertical: Spacing.xs,
   },
   backText: {
     color: Colors.textSecondary,
-    fontSize: FontSize.lg,
-    fontWeight: '600',
+    fontFamily: Fonts.sansBold,
+    fontSize: 13,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+  },
+  overline: {
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: 12,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
   },
   title: {
-    color: Colors.text,
-    fontSize: FontSize.xxxl,
-    fontWeight: '800',
+    marginTop: Spacing.xs,
     marginBottom: Spacing.xl,
+    color: Colors.text,
+    fontFamily: Fonts.displayBold,
+    fontVariant: ['lining-nums'],
+    fontSize: 40,
+    lineHeight: 48,
+    letterSpacing: 0.5,
   },
   ruleCard: {
-    backgroundColor: Colors.glass,
-    borderRadius: BorderRadius.xl,
-    padding: Spacing.lg,
     marginBottom: Spacing.md,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
   },
   ruleHeader: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
     marginBottom: Spacing.sm,
-    gap: Spacing.sm,
-  },
-  ruleEmoji: {
-    fontSize: 28,
   },
   ruleNumber: {
-    backgroundColor: Colors.primary,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: Colors.primary,
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.5,
-    shadowRadius: 8,
-  },
-  ruleNumberText: {
-    color: Colors.text,
-    fontSize: FontSize.xs,
-    fontWeight: '800',
+    color: Colors.primary,
+    fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
+    fontSize: 30,
+    lineHeight: 34,
   },
   ruleTitle: {
     color: Colors.text,
-    fontSize: FontSize.xl,
-    fontWeight: '700',
+    fontFamily: Fonts.display,
+    fontVariant: ['lining-nums'],
+    fontSize: 24,
+    letterSpacing: 0.5,
     marginBottom: Spacing.xs,
   },
   ruleDescription: {
     color: Colors.textSecondary,
-    fontSize: FontSize.md,
-    lineHeight: 22,
+    fontFamily: Fonts.sans,
+    fontSize: 15,
+    lineHeight: 23,
   },
   tipCard: {
-    backgroundColor: Colors.glass,
-    borderRadius: BorderRadius.xl,
-    padding: Spacing.lg,
     marginTop: Spacing.md,
-    borderLeftWidth: 4,
-    borderLeftColor: Colors.accent,
-    borderWidth: 1,
-    borderColor: Colors.borderLight,
+    borderLeftWidth: 2,
+    borderLeftColor: Colors.primary,
+  },
+  tipHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+    marginBottom: Spacing.sm,
   },
   tipTitle: {
-    color: Colors.accent,
-    fontSize: FontSize.lg,
-    fontWeight: '700',
-    marginBottom: Spacing.sm,
+    color: Colors.primary,
+    fontFamily: Fonts.sansBold,
+    fontSize: 12,
+    letterSpacing: 2.5,
+    textTransform: 'uppercase',
   },
   tipText: {
     color: Colors.textSecondary,
-    fontSize: FontSize.md,
-    lineHeight: 22,
+    fontFamily: Fonts.sans,
+    fontSize: 15,
+    lineHeight: 23,
   },
 });

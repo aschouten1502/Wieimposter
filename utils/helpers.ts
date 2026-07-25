@@ -14,3 +14,17 @@ export function shuffleArray<T>(array: T[]): T[] {
 export function getMaxImposters(playerCount: number): number {
   return Math.max(1, Math.floor(playerCount / 3));
 }
+
+/**
+ * Normalize a word for forgiving comparison: lowercase, strip accents,
+ * remove spaces/punctuation. So "McDonald's" === "mcdonalds" and
+ * "Nasi Goreng" === "nasigoreng" and "Poké Bowl" === "pokebowl".
+ */
+export function normalizeGuess(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]/g, '');
+}

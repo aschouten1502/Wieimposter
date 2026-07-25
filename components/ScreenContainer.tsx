@@ -3,6 +3,7 @@ import { View, StyleSheet, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Spacing } from '@/constants/theme';
+import { PatternBackdrop } from '@/components/Ornaments';
 
 interface ScreenContainerProps {
   children: React.ReactNode;
@@ -13,11 +14,12 @@ interface ScreenContainerProps {
 export function ScreenContainer({ children, style, centered }: ScreenContainerProps) {
   return (
     <LinearGradient
-      colors={['#0A0A1A', '#0F1128', '#0A0A1A']}
+      colors={['#0C1714', '#0A1412', '#071010']}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={styles.gradient}
     >
+      <PatternBackdrop />
       <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
         <View style={[styles.container, centered && styles.centered, style]}>
           {children}
@@ -33,7 +35,7 @@ const styles = StyleSheet.create({
   },
   safe: {
     flex: 1,
-    backgroundColor: '#0A0A1A',
+    backgroundColor: 'transparent',
   },
   container: {
     flex: 1,
