@@ -22,9 +22,7 @@ interface GameStore {
   allPlayersRevealed: () => boolean;
 
   // Voting & results
-  getVoteOrder: () => Player[];
-  startVoting: () => void;
-  castVote: (targetId: string) => void;
+  resolveVote: (votedPlayerId: string | null) => void;
   checkImposterGuess: (word: string) => boolean;
   applyImposterGuessed: () => void;
 
@@ -96,8 +94,6 @@ function buildRound(params: BuildRoundParams): { players: Player[]; round: Round
     phase: 'passing',
     roundResult: null,
     votedPlayerId: null,
-    votes: {},
-    currentVoterIndex: 0,
     trollModeEnabled: trollMode,
     trollRound: isTrollRound,
     hintsEnabled,
@@ -167,58 +163,20 @@ export const useGameStore = create<GameStore>((set, get) => ({
   },
 
   /**
-   * Voting order = hint order: players rotated so the player at
-   * hintStartIndex goes first, exactly like the hint round.
+   * The group counts down and points at one player at the same time; the app
+   * only records who they picked.
+   * - votedPlayerId === null → tie / nobody out → the imposter escapes and wins.
+   * - the picked player is an imposter → civilians win.
+   * - the picked player is a civilian → the imposter wins.
    */
-  getVoteOrder: () => {
-    const { players, round } = get();
-    if (!round) return [];
-    const startIdx = round.hintStartIndex;
-    return [...players.slice(startIdx), ...players.slice(0, startIdx)];
-  },
-
-  startVoting: () => {
-    const { round } = get();
-    if (!round) return;
-    set({ round: { ...round, phase: 'voting', votes: {}, currentVoterIndex: 0 } });
-  },
-
-  /**
-   * Register the current voter's secret vote.
-   * - Not the last voter → advance to the next voter.
-   * - Last voter → tally: unique top → that player is voted out;
-   *   tie at the top → votedPlayerId = null (nobody eliminated, imposter escapes).
-   *   Then apply the outcome/score rules and move to results.
-   */
-  castVote: (targetId) => {
+  resolveVote: (votedPlayerId) => {
     const { round, players } = get();
     if (!round) return;
-
-    const voteOrder = get().getVoteOrder();
-    const voter = voteOrder[round.currentVoterIndex];
-    if (!voter) return;
-
-    const votes = { ...round.votes, [voter.id]: targetId };
-    const isLastVoter = round.currentVoterIndex >= voteOrder.length - 1;
-
-    if (!isLastVoter) {
-      set({ round: { ...round, votes, currentVoterIndex: round.currentVoterIndex + 1 } });
-      return;
-    }
-
-    // Tally: unique highest wins; a tie at the top eliminates nobody.
-    const counts: Record<string, number> = {};
-    Object.values(votes).forEach((id) => {
-      counts[id] = (counts[id] ?? 0) + 1;
-    });
-    const topCount = Math.max(...Object.values(counts));
-    const topIds = Object.keys(counts).filter((id) => counts[id] === topCount);
-    const votedPlayerId = topIds.length === 1 ? topIds[0] : null;
 
     // Troll round: nobody actually knew the word, so the vote is just for fun.
     if (round.trollRound) {
       set({
-        round: { ...round, votes, roundResult: 'imposter_wins', votedPlayerId, phase: 'results' },
+        round: { ...round, roundResult: 'imposter_wins', votedPlayerId, phase: 'results' },
       });
       return;
     }
@@ -238,7 +196,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 
     set({
       players: updatedPlayers,
-      round: { ...round, votes, roundResult: result, votedPlayerId, phase: 'results' },
+      round: { ...round, roundResult: result, votedPlayerId, phase: 'results' },
     });
   },
 

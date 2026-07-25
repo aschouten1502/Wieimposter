@@ -40,9 +40,7 @@ export function CategoryCard({ category, selected, onPress }: CategoryCardProps)
       </View>
       <Text
         style={[styles.name, selected && styles.nameSelected]}
-        numberOfLines={1}
-        adjustsFontSizeToFit
-        minimumFontScale={0.75}
+        numberOfLines={2}
       >
         {category.name}
       </Text>

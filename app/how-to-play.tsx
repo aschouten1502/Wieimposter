@@ -42,15 +42,15 @@ const RULES: Rule[] = [
   },
   {
     Icon: IconVote,
-    title: 'Stemmen',
+    title: 'Aanwijzen',
     description:
-      'Daarna stemt iedereen geheim via de telefoon, in dezelfde volgorde als de hints. Bij gelijkspel ontsnapt de imposter.',
+      'Tel hardop af: drie, twee, één — en wijs allemaal tegelijk één persoon aan. Zeg het woord nog niet hardop. Bij gelijkspel ontsnapt de imposter.',
   },
   {
     Icon: IconTrophy,
     title: 'Winnen',
     description:
-      'De burgers winnen als de imposter wordt weggestemd. De imposter wint bij ontsnappen — of door na ontmaskering het woord alsnog te raden.',
+      'Is de imposter aangewezen, dan krijgt die nog één kans: hardop het geheime woord noemen. Klopt het, dan wint de imposter alsnog. Anders winnen de burgers.',
   },
 ];
 

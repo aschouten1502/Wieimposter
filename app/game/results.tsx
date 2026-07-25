@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TextInput, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import Animated, { FadeIn, FadeInDown, FadeInUp, ZoomIn } from 'react-native-reanimated';
 import { ScreenContainer } from '@/components/ScreenContainer';
@@ -11,23 +11,22 @@ import { IconMask, IconLeaf, IconSparkle, IconCrown } from '@/components/icons';
 import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { PLAYER_COLORS } from '@/constants/config';
 import { useGameStore } from '@/store/gameStore';
+import { fitFontSize } from '@/utils/helpers';
 import { useStatsStore } from '@/store/statsStore';
 import { useHaptics } from '@/hooks/useHaptics';
 
-type GuessOutcome = 'correct' | 'wrong' | 'unrecognized' | null;
+function fitWord(word: string) {
+  const fontSize = fitFontSize(word, { max: 40, min: 18, maxChars: 11, lines: 2 });
+  return { fontSize, lineHeight: Math.round(fontSize * 1.2) };
+}
 
 export default function ResultsScreen() {
   const router = useRouter();
   const haptics = useHaptics();
-  const [showFinalGuess, setShowFinalGuess] = useState(false);
-  const [guessText, setGuessText] = useState('');
-  const [guessOutcome, setGuessOutcome] = useState<GuessOutcome>(null);
   const hapticsTriggered = useRef(false);
 
   const round = useGameStore((s) => s.round);
   const players = useGameStore((s) => s.players);
-  const checkImposterGuess = useGameStore((s) => s.checkImposterGuess);
-  const applyImposterGuessed = useGameStore((s) => s.applyImposterGuessed);
   const nextRound = useGameStore((s) => s.nextRound);
   const resetGame = useGameStore((s) => s.resetGame);
   const recordGame = useStatsStore((s) => s.recordGame);
@@ -40,18 +39,6 @@ export default function ResultsScreen() {
   const imposters = useMemo(() => {
     if (!round) return [];
     return players.filter((p) => round.imposterIds.includes(p.id));
-  }, [players, round]);
-
-  const voteTally = useMemo(() => {
-    if (!round) return [];
-    const counts: Record<string, number> = {};
-    Object.values(round.votes).forEach((targetId) => {
-      counts[targetId] = (counts[targetId] ?? 0) + 1;
-    });
-    return players
-      .map((p, index) => ({ player: p, index, count: counts[p.id] ?? 0 }))
-      .filter((entry) => entry.count >= 1)
-      .sort((a, b) => b.count - a.count);
   }, [players, round]);
 
   const scoreboard = useMemo(() => {
@@ -76,22 +63,6 @@ export default function ResultsScreen() {
   const imposterGuessed = round.roundResult === 'imposter_guessed';
   const isTrollRound = round.trollRound === true;
   const nobodyVoted = !round.votedPlayerId;
-
-  const acceptGuess = () => {
-    applyImposterGuessed();
-    setGuessOutcome('correct');
-    haptics.success();
-  };
-
-  const handleFinalGuess = () => {
-    if (checkImposterGuess(guessText)) {
-      acceptGuess();
-    } else {
-      // Not an exact match — let the group decide if it counts.
-      setGuessOutcome('unrecognized');
-      haptics.warning();
-    }
-  };
 
   const recordAndProceed = (callback: () => void) => {
     const result = useGameStore.getState().round?.roundResult;
@@ -185,7 +156,7 @@ export default function ResultsScreen() {
         <Animated.View entering={FadeInUp.duration(500).delay(600)}>
           <GlassCard style={styles.wordCard}>
             <Text style={styles.wordLabel}>Het geheime woord</Text>
-            <Text style={styles.wordValue} adjustsFontSizeToFit numberOfLines={1}>
+            <Text style={[styles.wordValue, fitWord(round.secretWord)]} numberOfLines={2}>
               {round.secretWord}
             </Text>
           </GlassCard>
@@ -208,109 +179,17 @@ export default function ResultsScreen() {
           })}
         </Animated.View>
 
-        {/* Uitgestemd */}
-        {votedPlayer && !isTrollRound && (
+        {/* Aangewezen — alleen tonen als de groep de verkeerde koos,
+            anders herhaalt het simpelweg de imposterregel hierboven. */}
+        {votedPlayer && !isTrollRound && !round.imposterIds.includes(votedPlayer.id) && (
           <Animated.View entering={FadeInUp.duration(400).delay(900)} style={styles.section}>
-            <Text style={styles.sectionTitle}>Uitgestemd</Text>
+            <Text style={styles.sectionTitle}>Aangewezen</Text>
             <PlayerBadge
               name={votedPlayer.name}
               index={players.findIndex((p) => p.id === votedPlayer.id)}
-              isImposter={round.imposterIds.includes(votedPlayer.id)}
+              isImposter={false}
               showRole={true}
             />
-          </Animated.View>
-        )}
-
-        {/* Stemmen */}
-        {voteTally.length > 0 && (
-          <Animated.View entering={FadeInUp.duration(400).delay(950)} style={styles.section}>
-            <Text style={styles.sectionTitle}>Stemmen</Text>
-            {voteTally.map(({ player, index, count }) => (
-              <PlayerBadge
-                key={player.id}
-                name={player.name}
-                index={index}
-                voteCount={count}
-              />
-            ))}
-          </Animated.View>
-        )}
-
-        {/* Laatste gok (alleen als de imposter is gepakt) */}
-        {civiliansWon && guessOutcome === null && !showFinalGuess && (
-          <Animated.View entering={FadeIn.duration(400).delay(1000)} style={styles.section}>
-            <Button
-              title="IMPOSTER MAG RADEN"
-              onPress={() => setShowFinalGuess(true)}
-              variant="secondary"
-              size="md"
-            />
-          </Animated.View>
-        )}
-
-        {showFinalGuess && (guessOutcome === null || guessOutcome === 'unrecognized') && (
-          <GlassCard style={styles.guessCard}>
-            <Text style={styles.guessOverline}>Laatste kans</Text>
-            <Text style={styles.guessLabel}>Imposter, raad het woord.</Text>
-            <TextInput
-              style={styles.guessInput}
-              value={guessText}
-              onChangeText={setGuessText}
-              placeholder="Typ het woord"
-              placeholderTextColor={Colors.textMuted}
-              autoCorrect={false}
-              autoCapitalize="none"
-              editable={guessOutcome === null}
-            />
-            {guessOutcome === null ? (
-              <Button
-                title="BEVESTIG"
-                onPress={handleFinalGuess}
-                disabled={!guessText.trim()}
-                size="md"
-              />
-            ) : (
-              <View style={styles.overrideBox}>
-                <Text style={styles.overrideText}>
-                  "{guessText.trim()}" komt niet exact overeen. Vond de groep dit tóch goed?
-                </Text>
-                <View style={styles.overrideButtons}>
-                  <Button
-                    title="JA, TELT"
-                    onPress={acceptGuess}
-                    size="md"
-                    style={styles.overrideButton}
-                  />
-                  <Button
-                    title="NEE, FOUT"
-                    onPress={() => {
-                      setGuessOutcome('wrong');
-                      haptics.error();
-                    }}
-                    variant="secondary"
-                    size="md"
-                    style={styles.overrideButton}
-                  />
-                </View>
-              </View>
-            )}
-          </GlassCard>
-        )}
-
-        {(guessOutcome === 'correct' || guessOutcome === 'wrong') && (
-          <Animated.View entering={ZoomIn.duration(400)}>
-            <GlassCard style={styles.guessResultCard}>
-              <Text
-                style={[
-                  styles.guessResultText,
-                  guessOutcome === 'correct' ? styles.guessCorrect : styles.guessWrong,
-                ]}
-              >
-                {guessOutcome === 'correct'
-                  ? 'Correct! De imposter wint alsnog.'
-                  : 'Fout. De burgers houden de winst.'}
-              </Text>
-            </GlassCard>
           </Animated.View>
         )}
 

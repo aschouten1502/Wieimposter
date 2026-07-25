@@ -7,7 +7,13 @@ import { Button } from '@/components/Button';
 import { CornerFrame } from '@/components/Ornaments';
 import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
+import { fitFontSize } from '@/utils/helpers';
 import { PLAYER_COLORS } from '@/constants/config';
+
+function fitName(name: string) {
+  const fontSize = fitFontSize(name, { max: 52, min: 24, maxChars: 9, lines: 2 });
+  return { fontSize, lineHeight: Math.round(fontSize * 1.16) };
+}
 
 export default function HintStartScreen() {
   const router = useRouter();
@@ -46,9 +52,8 @@ export default function HintStartScreen() {
           <Text style={styles.startLabel}>BEGINT MET HINTS</Text>
           <View style={[styles.nameDiamond, { backgroundColor: color }]} />
           <Text
-            style={[styles.startName, { color }]}
-            adjustsFontSizeToFit
-            numberOfLines={1}
+            style={[styles.startName, { color }, fitName(startPlayer.name)]}
+            numberOfLines={2}
           >
             {startPlayer.name}
           </Text>
