@@ -7,8 +7,16 @@ import { CornerFrame, Medallion, PatternBackdrop } from '@/components/Ornaments'
 import { IconEye, IconMask } from '@/components/icons';
 import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
+import { fitFontSize } from '@/utils/helpers';
 import { useHaptics } from '@/hooks/useHaptics';
 import { PLAYER_COLORS } from '@/constants/config';
+
+// The secret word can be as long as "Goede Tijden, Slechte Tijden"; scale it
+// down so it always fits the card instead of being cut off.
+function fitWord(word: string) {
+  const fontSize = fitFontSize(word, { max: 46, min: 20, maxChars: 11, lines: 2 });
+  return { fontSize, lineHeight: Math.round(fontSize * 1.2) };
+}
 
 export default function RevealScreen() {
   const router = useRouter();
@@ -171,11 +179,7 @@ export default function RevealScreen() {
           ) : (
             <View style={styles.roleContent}>
               <Text style={styles.backOverline}>JOUW WOORD</Text>
-              <Text
-                style={styles.secretWord}
-                adjustsFontSizeToFit
-                numberOfLines={1}
-              >
+              <Text style={[styles.secretWord, fitWord(round.secretWord)]} numberOfLines={2}>
                 {round.secretWord}
               </Text>
               <View style={styles.jadeHairline} />

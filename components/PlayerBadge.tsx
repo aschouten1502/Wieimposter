@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
 import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { PLAYER_COLORS } from '@/constants/config';
+import { fitFontSize } from '@/utils/helpers';
 
 interface PlayerBadgeProps {
   name: string;
@@ -36,7 +37,12 @@ export function PlayerBadge({
       ]}
     >
       <View style={[styles.diamond, { backgroundColor: color }]} />
-      <Text style={styles.name} numberOfLines={1}>{name}</Text>
+      <Text
+        style={[styles.name, { fontSize: fitFontSize(name, { max: 17, min: 13, maxChars: showRole ? 14 : 20 }) }]}
+        numberOfLines={1}
+      >
+        {name}
+      </Text>
       {showRole && isImposter !== undefined && (
         <Text style={[styles.role, isImposter ? styles.roleImposter : styles.roleCivilian]}>
           {isImposter ? 'IMPOSTER' : 'BURGER'}

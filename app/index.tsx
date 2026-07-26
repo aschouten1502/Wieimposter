@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
@@ -9,6 +9,9 @@ import { Colors, Fonts, Spacing } from '@/constants/theme';
 
 export default function HomeScreen() {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  // "IMPOSTER" is 8 tekens; houd marge zodat het nooit clipt op smalle schermen.
+  const titleSize = Math.max(38, Math.min(64, Math.floor((width - 48) / 8.2)));
 
   return (
     <ScreenContainer centered>
@@ -17,7 +20,7 @@ export default function HomeScreen() {
           <IconMask size={46} color={Colors.primary} />
         </Medallion>
         <Text style={styles.overline}>HET GEZELSCHAPSSPEL</Text>
-        <Text style={styles.title} adjustsFontSizeToFit numberOfLines={1}>
+        <Text style={[styles.title, { fontSize: titleSize, lineHeight: Math.round(titleSize * 1.12) }]} numberOfLines={1}>
           IMPOSTER
         </Text>
         <OrnamentDivider style={styles.divider} />

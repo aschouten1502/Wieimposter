@@ -6,7 +6,13 @@ import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
 import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
+import { fitFontSize } from '@/utils/helpers';
 import { PLAYER_COLORS } from '@/constants/config';
+
+function fitName(name: string) {
+  const fontSize = fitFontSize(name, { max: 60, min: 26, maxChars: 10, lines: 2 });
+  return { fontSize, lineHeight: Math.round(fontSize * 1.16) };
+}
 
 export default function PassScreen() {
   const router = useRouter();
@@ -31,9 +37,8 @@ export default function PassScreen() {
         </Animated.Text>
         <Animated.Text
           entering={FadeInDown.duration(500).delay(120)}
-          style={[styles.playerName, { color, textShadowColor: color + '55' }]}
-          adjustsFontSizeToFit
-          numberOfLines={1}
+          style={[styles.playerName, { color, textShadowColor: color + '55' }, fitName(currentPlayer.name)]}
+          numberOfLines={2}
         >
           {currentPlayer.name}
         </Animated.Text>

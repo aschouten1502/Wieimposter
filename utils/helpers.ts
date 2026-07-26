@@ -16,6 +16,32 @@ export function getMaxImposters(playerCount: number): number {
 }
 
 /**
+ * Pick a font size that lets `text` fit without clipping.
+ *
+ * react-native-web ignores `adjustsFontSizeToFit`, so long values like
+ * "Goede Tijden, Slechte Tijden" got cut off ("Memphis Dep..."). This scales
+ * the size down instead, honouring both the longest single word (which can
+ * never wrap) and the total length spread over the allowed number of lines.
+ */
+export function fitFontSize(
+  text: string,
+  options: { max: number; min: number; maxChars: number; lines?: number }
+): number {
+  const { max, min, maxChars, lines = 1 } = options;
+  const trimmed = (text ?? '').trim();
+  if (!trimmed) return max;
+
+  const longestWord = trimmed
+    .split(/\s+/)
+    .reduce((longest, word) => Math.max(longest, word.length), 0);
+  const perLine = Math.ceil(trimmed.length / Math.max(1, lines));
+  const effective = Math.max(longestWord, perLine);
+
+  if (effective <= maxChars) return max;
+  return Math.max(min, Math.round((max * maxChars) / effective));
+}
+
+/**
  * Normalize a word for forgiving comparison: lowercase, strip accents,
  * remove spaces/punctuation. So "McDonald's" === "mcdonalds" and
  * "Nasi Goreng" === "nasigoreng" and "Poké Bowl" === "pokebowl".
