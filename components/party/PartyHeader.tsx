@@ -76,10 +76,11 @@ const styles = StyleSheet.create({
     flex: 1,
     color: Colors.primary,
     fontFamily: Fonts.sansBold,
-    fontSize: FontSize.xs,
-    letterSpacing: 2.5,
+    fontSize: 11,
+    letterSpacing: 1.5,
     textTransform: 'uppercase',
     textAlign: 'center',
+    marginHorizontal: Spacing.xs,
   },
   pills: {
     flexDirection: 'row',

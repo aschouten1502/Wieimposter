@@ -427,10 +427,16 @@ export function IconBomb({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconPr
   const s = strokeProps(color, strokeWidth);
   return (
     <IconFrame size={size}>
-      <Circle cx={10.5} cy={14} r={6} {...s} />
-      <Path d="M14.4 9.6 L16.2 7.8" {...s} />
-      <Path d="M16.2 7.8 C17.2 6.8 18.6 6.6 19.6 5.4 C20 4.9 20.2 4.2 20 3.6" {...s} />
-      <Path d="M19.2 5.6 L20.8 4.2 M20.9 6.4 L21.6 5.1" {...s} />
+      {/* bol */}
+      <Circle cx={10} cy={14.5} r={6.2} {...s} />
+      {/* glans */}
+      <Path d="M6.9 13.2 C7.1 11.6 8 10.5 9.3 10" {...s} />
+      {/* dop */}
+      <Path d="M13.6 9.6 L15.4 7.8 L17.2 9.6 L15.4 11.4 Z" {...s} />
+      {/* lont */}
+      <Path d="M16.3 8.7 C17.2 7 18.6 7.6 19.4 6.2 C19.8 5.5 19.7 4.8 19.3 4.2" {...s} />
+      {/* vonk */}
+      <Path d="M20.4 3.2 L21.4 2.2 M19.1 2.9 L19.1 1.6 M21.2 4.6 L22.4 4.6" {...s} />
     </IconFrame>
   );
 }

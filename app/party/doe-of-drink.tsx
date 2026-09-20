@@ -253,7 +253,7 @@ const styles = StyleSheet.create({
     flex: 1,
     minHeight: 200,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     paddingVertical: Spacing.xl,
     paddingHorizontal: Spacing.md,
     borderRadius: BorderRadius.xl,
@@ -286,6 +286,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: Spacing.sm,
     lineHeight: 17,
+    minHeight: 34,
   },
   footer: {
     paddingTop: Spacing.md,

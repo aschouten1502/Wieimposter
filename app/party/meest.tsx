@@ -18,6 +18,9 @@ const GAME_KEY = 'meest';
 const DOUBLE_EVERY = 6;
 
 const game = getPartyGame('meest')!;
+// Vaste lege lijst: een selector die telkens een nieuwe [] teruggeeft,
+// laat zustand v5 eindeloos her-renderen (wit scherm).
+const EMPTY_SEEN: string[] = [];
 
 const RULES = [
   'Lees de kaart hardop voor. Wie in de groep zou dit het eerst doen?',
@@ -30,7 +33,7 @@ type Phase = 'intro' | 'play';
 export default function MeestScreen() {
   const level = usePartyStore((s) => s.level);
   const drinkMode = usePartyStore((s) => s.drinkMode);
-  const seenIds = usePartyStore((s) => s.seen[GAME_KEY] ?? []);
+  const seenIds = usePartyStore((s) => s.seen[GAME_KEY]) ?? EMPTY_SEEN;
   const markSeen = usePartyStore((s) => s.markSeen);
   const resetSeen = usePartyStore((s) => s.resetSeen);
 
