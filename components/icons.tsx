@@ -388,6 +388,103 @@ export function IconMusic({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconP
   );
 }
 
+/** Vlam — voor hete vragen en pittige niveaus. */
+export function IconFlame({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconProps) {
+  const s = strokeProps(color, strokeWidth);
+  return (
+    <IconFrame size={size}>
+      <Path d="M12 3.2 C12.6 6.2 15.4 7.6 16.6 10.2 C18 13.3 16.6 17.6 12.9 19.6 C13.9 17.9 13.4 16.1 12.1 14.9 C10.9 16 10.2 17.5 10.7 19.6 C7.6 18.2 5.8 15.1 6.6 11.8 C7.1 9.6 8.6 8.2 9.5 6.6 C9.8 8 10.6 8.9 11.5 9.2 C10.9 7.1 11.2 5 12 3.2 Z" {...s} />
+    </IconFrame>
+  );
+}
+
+/** Glas — drankmodus. */
+export function IconGlass({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconProps) {
+  const s = strokeProps(color, strokeWidth);
+  return (
+    <IconFrame size={size}>
+      <Path d="M6.5 4 H17.5 L16.4 13.2 C16.2 15.4 14.3 17 12 17 C9.7 17 7.8 15.4 7.6 13.2 Z" {...s} />
+      <Path d="M7.2 9.5 H16.8" {...s} />
+      <Path d="M12 17 V20.2 M8.8 20.2 H15.2" {...s} />
+    </IconFrame>
+  );
+}
+
+/** Pijlen links-rechts — kijk-links-kijk-rechts. */
+export function IconArrows({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconProps) {
+  const s = strokeProps(color, strokeWidth);
+  return (
+    <IconFrame size={size}>
+      <Path d="M3.5 12 H20.5" {...s} />
+      <Path d="M7.5 8 L3.5 12 L7.5 16" {...s} />
+      <Path d="M16.5 8 L20.5 12 L16.5 16" {...s} />
+    </IconFrame>
+  );
+}
+
+/** Bom met lont — woordenbom. */
+export function IconBomb({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconProps) {
+  const s = strokeProps(color, strokeWidth);
+  return (
+    <IconFrame size={size}>
+      <Circle cx={10.5} cy={14} r={6} {...s} />
+      <Path d="M14.4 9.6 L16.2 7.8" {...s} />
+      <Path d="M16.2 7.8 C17.2 6.8 18.6 6.6 19.6 5.4 C20 4.9 20.2 4.2 20 3.6" {...s} />
+      <Path d="M19.2 5.6 L20.8 4.2 M20.9 6.4 L21.6 5.1" {...s} />
+    </IconFrame>
+  );
+}
+
+/** Hart — waarheid of opdracht. */
+export function IconHeart({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconProps) {
+  const s = strokeProps(color, strokeWidth);
+  return (
+    <IconFrame size={size}>
+      <Path d="M12 20 C7 16.2 3.6 13.2 3.6 9.3 C3.6 6.9 5.4 5 7.8 5 C9.5 5 10.9 5.9 12 7.4 C13.1 5.9 14.5 5 16.2 5 C18.6 5 20.4 6.9 20.4 9.3 C20.4 13.2 17 16.2 12 20 Z" {...s} />
+    </IconFrame>
+  );
+}
+
+/** Wijzende hand — meest waarschijnlijk. */
+export function IconHand({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconProps) {
+  const s = strokeProps(color, strokeWidth);
+  return (
+    <IconFrame size={size}>
+      <Path d="M9 11.5 V5.2 C9 4.4 9.6 3.8 10.4 3.8 C11.2 3.8 11.8 4.4 11.8 5.2 V11" {...s} />
+      <Path d="M11.8 11 V9.6 C11.8 8.8 12.4 8.2 13.2 8.2 C14 8.2 14.6 8.8 14.6 9.6 V11.4" {...s} />
+      <Path d="M14.6 11.4 V10.4 C14.6 9.6 15.2 9 16 9 C16.8 9 17.4 9.6 17.4 10.4 V12" {...s} />
+      <Path d="M17.4 12 C17.4 11.4 17.9 10.9 18.5 10.9 C19.1 10.9 19.6 11.4 19.6 12 V15.2 C19.6 18.2 17.2 20.4 14.2 20.4 H12.8 C11 20.4 9.5 19.6 8.5 18.2 L5.2 13.6 C4.8 13 4.9 12.2 5.5 11.8 C6.1 11.4 6.9 11.5 7.3 12.1 L9 14.2" {...s} />
+    </IconFrame>
+  );
+}
+
+/** Zandloper — tijd/tellers. */
+export function IconTimer({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconProps) {
+  const s = strokeProps(color, strokeWidth);
+  return (
+    <IconFrame size={size}>
+      <Path d="M7 3.5 H17 M7 20.5 H17" {...s} />
+      <Path d="M8 3.5 V6.2 C8 8.4 9.6 10 12 12 C14.4 14 16 15.6 16 17.8 V20.5" {...s} />
+      <Path d="M16 3.5 V6.2 C16 8.4 14.4 10 12 12 C9.6 14 8 15.6 8 17.8 V20.5" {...s} />
+    </IconFrame>
+  );
+}
+
+/** Dobbelsteen — willekeur. */
+export function IconDice({ size = 24, color = IVORY, strokeWidth = 1.5 }: IconProps) {
+  const s = strokeProps(color, strokeWidth);
+  return (
+    <IconFrame size={size}>
+      <Rect x={4} y={4} width={16} height={16} rx={3.5} {...s} />
+      <Circle cx={8.5} cy={8.5} r={1.1} fill={color} />
+      <Circle cx={15.5} cy={8.5} r={1.1} fill={color} />
+      <Circle cx={12} cy={12} r={1.1} fill={color} />
+      <Circle cx={8.5} cy={15.5} r={1.1} fill={color} />
+      <Circle cx={15.5} cy={15.5} r={1.1} fill={color} />
+    </IconFrame>
+  );
+}
+
 export const CategoryIcons: Record<
   string,
   React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>

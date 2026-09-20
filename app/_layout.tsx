@@ -44,6 +44,7 @@ export default function RootLayout() {
         <Stack.Screen name="categories" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="settings" options={{ animation: 'slide_from_right' }} />
         <Stack.Screen name="game" />
+        <Stack.Screen name="party" />
       </Stack>
     </>
   );
