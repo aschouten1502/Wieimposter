@@ -82,7 +82,7 @@ export default function HomeScreen() {
             <IconMask size={38} color={Colors.primary} />
           </Medallion>
           <Text style={styles.overline}>SPELLETJES VOOR AAN TAFEL</Text>
-          <Text style={styles.title}>Speelavond</Text>
+          <Text style={styles.title}>GameFame</Text>
           <OrnamentDivider style={styles.divider} />
           <Text style={styles.tagline}>Kies een spel. De telefoon doet de rest.</Text>
         </View>

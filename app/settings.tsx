@@ -44,7 +44,7 @@ export default function SettingsScreen() {
         <OrnamentDivider style={styles.divider} />
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Who's the Imposter v1.0.0</Text>
+          <Text style={styles.footerText}>GameFame v1.0.0</Text>
         </View>
       </ScrollView>
     </ScreenContainer>
