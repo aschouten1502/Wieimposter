@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, ScrollView, Platform } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Platform, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { ScreenContainer } from '@/components/ScreenContainer';
 import { Button } from '@/components/Button';
@@ -7,6 +7,7 @@ import { Stepper } from '@/components/Stepper';
 import { PlayerInput } from '@/components/PlayerInput';
 import { CategoryCard } from '@/components/CategoryCard';
 import { OrnamentDivider } from '@/components/Ornaments';
+import { IconChevronLeft } from '@/components/icons';
 import { Colors, Fonts, Spacing, BorderRadius, GlassStyle } from '@/constants/theme';
 import { MIN_PLAYERS, MAX_PLAYERS } from '@/constants/config';
 import { categories } from '@/data/categories';
@@ -86,8 +87,22 @@ export default function SetupScreen() {
   return (
     <ScreenContainer>
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
+        <View style={styles.topRow}>
+          <TouchableOpacity onPress={() => router.replace('/')} style={styles.backLink} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
+            <IconChevronLeft size={16} color={Colors.textSecondary} />
+            <Text style={styles.linkText}>Hub</Text>
+          </TouchableOpacity>
+          <View style={styles.topLinks}>
+            <TouchableOpacity onPress={() => router.push('/how-to-play')} hitSlop={{ top: 10, bottom: 10, left: 6, right: 6 }}>
+              <Text style={styles.linkText}>Uitleg</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('/categories')} hitSlop={{ top: 10, bottom: 10, left: 6, right: 6 }}>
+              <Text style={styles.linkText}>Woorden</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         <View style={styles.headerBlock}>
-          <Text style={styles.overline}>Nieuwe ronde</Text>
+          <Text style={styles.overline}>Imposter</Text>
           <Text style={styles.header}>Nieuw spel</Text>
         </View>
 
@@ -182,6 +197,22 @@ const styles = StyleSheet.create({
   headerBlock: {
     marginTop: Spacing.md,
     marginBottom: Spacing.xl,
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: Spacing.sm,
+    marginBottom: Spacing.md,
+  },
+  backLink: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  topLinks: { flexDirection: 'row', gap: Spacing.lg },
+  linkText: {
+    color: Colors.textSecondary,
+    fontFamily: Fonts.sansBold,
+    fontSize: 12,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   overline: {
     color: Colors.primary,

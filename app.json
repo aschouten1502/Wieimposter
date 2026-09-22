@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Who's the Imposter",
+    "name": "GameFame",
     "slug": "wieimposter",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -28,8 +28,8 @@
     "web": {
       "favicon": "./assets/favicon.png",
       "bundler": "metro",
-      "name": "Who's the Imposter",
-      "shortName": "Imposter",
+      "name": "GameFame",
+      "shortName": "GameFame",
       "description": "Wie is de imposter? Een party game voor vrienden!",
       "themeColor": "#0A1412",
       "backgroundColor": "#0A1412"
