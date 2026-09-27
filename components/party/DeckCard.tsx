@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Animated, { FadeInRight, FadeOutLeft } from 'react-native-reanimated';
 import { CornerFrame, PatternBackdrop } from '@/components/Ornaments';
 import { Colors, Fonts, Spacing, BorderRadius } from '@/constants/theme';
 import { fitFontSize } from '@/utils/helpers';
+import { sfx } from '@/utils/sound';
 
 interface DeckCardProps {
   /** Unieke sleutel zodat elke nieuwe kaart in-animeert. */
@@ -23,6 +24,11 @@ interface DeckCardProps {
  */
 export function DeckCard({ cardKey, overline, text, footer, accent = Colors.primary, onPress }: DeckCardProps) {
   const fontSize = fitFontSize(text, { max: 34, min: 20, maxChars: 16, lines: 5 });
+
+  // Elke nieuwe kaart krijgt een zachte swoosh, ongeacht welke knop hem trok.
+  useEffect(() => {
+    sfx.card();
+  }, [cardKey]);
 
   return (
     <Animated.View

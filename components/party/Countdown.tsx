@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import Animated, { ZoomIn, FadeOut } from 'react-native-reanimated';
 import { Colors, Fonts } from '@/constants/theme';
 import { useHaptics } from '@/hooks/useHaptics';
+import { sfx } from '@/utils/sound';
 
 interface CountdownProps {
   /** Vanaf welk getal (standaard 3). */
@@ -26,10 +27,12 @@ export function Countdown({ from = 3, finalWord, onDone, color = Colors.primary 
   useEffect(() => {
     if (count > 0) {
       haptics.medium();
+      sfx.tick(count);
       const t = setTimeout(() => setCount((c) => c - 1), 850);
       return () => clearTimeout(t);
     }
     haptics.heavy();
+    sfx.go();
     const t = setTimeout(onDone, 1100);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps

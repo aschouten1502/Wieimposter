@@ -11,6 +11,7 @@ import { PLAYER_COLORS } from '@/constants/config';
 import { getPartyGame } from '@/data/games';
 import { heetDeck } from '@/data/party/heet';
 import { usePartyStore } from '@/store/partyStore';
+import { sfx } from '@/utils/sound';
 import { filterByLevel, drawNext, penalty } from '@/utils/party';
 import { fitFontSize, shuffleArray } from '@/utils/helpers';
 import { DeckItem } from '@/types/party';
@@ -198,7 +199,7 @@ export default function HeetScreen() {
       <View style={styles.buttons}>
         <Button title="Beantwoord" onPress={step} size="lg" />
         {!isGroup && (
-          <Button title={`Ik pas — ${passPenalty}`} onPress={step} variant="secondary" size="md" />
+          <Button title={`Ik pas — ${passPenalty}`} onPress={() => { sfx.penalty(); step(); }} variant="secondary" size="md" />
         )}
         <Button title="Stoppen" onPress={stop} variant="ghost" size="sm" />
       </View>

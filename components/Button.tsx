@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Colors, Fonts, Spacing, FontSize, BorderRadius, ButtonHeight } from '@/constants/theme';
 import { useHaptics } from '@/hooks/useHaptics';
+import { unlockAudio } from '@/utils/sound';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -57,6 +58,7 @@ export function Button({
   };
 
   const handlePress = () => {
+    unlockAudio();
     if (disabled || loading) return;
     haptics.light();
     onPress();

@@ -12,6 +12,7 @@ import { getPartyGame } from '@/data/games';
 import { categories } from '@/data/categories';
 import { Category } from '@/types/game';
 import { usePartyStore } from '@/store/partyStore';
+import { sfx } from '@/utils/sound';
 import { useHaptics } from '@/hooks/useHaptics';
 import { penalty, penaltyVerb } from '@/utils/party';
 
@@ -78,15 +79,24 @@ export default function WoordenbomScreen() {
   useEffect(() => {
     if (phase !== 'armed' || !round) return;
 
+    // Rustige lont-tik zolang de bom loopt; in de eindsprint sneller en scherper.
+    let slow: ReturnType<typeof setInterval> | undefined = setInterval(() => sfx.fuse(false), 1000);
     let tick: ReturnType<typeof setInterval> | undefined;
     const hurryTimer = setTimeout(() => {
       setHurry(true);
+      if (slow) clearInterval(slow);
+      slow = undefined;
       hapticsRef.current.light();
-      tick = setInterval(() => hapticsRef.current.light(), 1000);
+      sfx.fuse(true);
+      tick = setInterval(() => {
+        hapticsRef.current.light();
+        sfx.fuse(true);
+      }, 500);
     }, Math.max(0, round.fuseMs - HURRY_MS));
 
     const boomTimer = setTimeout(() => {
       hapticsRef.current.heavy();
+      sfx.explode();
       setBoomPenalty(penalty(drinkRef.current, 3));
       setPhase('boom');
     }, round.fuseMs);
@@ -94,6 +104,7 @@ export default function WoordenbomScreen() {
     return () => {
       clearTimeout(hurryTimer);
       clearTimeout(boomTimer);
+      if (slow) clearInterval(slow);
       if (tick) clearInterval(tick);
     };
   }, [phase, round]);

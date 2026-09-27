@@ -12,6 +12,7 @@ import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/co
 import { PLAYER_COLORS } from '@/constants/config';
 import { useGameStore } from '@/store/gameStore';
 import { fitFontSize } from '@/utils/helpers';
+import { sfx } from '@/utils/sound';
 import { useStatsStore } from '@/store/statsStore';
 import { useHaptics } from '@/hooks/useHaptics';
 
@@ -51,8 +52,11 @@ export default function ResultsScreen() {
     if (round?.roundResult && !hapticsTriggered.current) {
       haptics.heavy();
       hapticsTriggered.current = true;
+      if (round.trollRound) sfx.troll();
+      else if (round.roundResult === 'civilians_win') sfx.winCivilians();
+      else sfx.winImposter();
     }
-  }, [round?.roundResult, haptics]);
+  }, [round?.roundResult, round?.trollRound, haptics]);
 
   if (!round) {
     router.replace('/');
