@@ -13,6 +13,7 @@ import { getPartyGame } from '@/data/games';
 import { waarheidDeck } from '@/data/party/waarheid';
 import { opdrachtDeck } from '@/data/party/opdracht';
 import { usePartyStore } from '@/store/partyStore';
+import { sfx } from '@/utils/sound';
 import { drawNext, filterByLevel, penalty, penaltyVerb } from '@/utils/party';
 import { fitFontSize, shuffleArray } from '@/utils/helpers';
 import { useHaptics } from '@/hooks/useHaptics';
@@ -194,7 +195,7 @@ export default function WaarheidOfOpdrachtScreen() {
           <DeckCard cardKey={item.id} overline={STACK_LABEL[stack]} text={item.text} accent={game.accent} />
           <View style={styles.footer}>
             <Button title="GEDAAN" onPress={nextTurn} size="lg" />
-            <Button title={refuseText} onPress={nextTurn} variant="secondary" size="md" style={styles.refuse} />
+            <Button title={refuseText} onPress={() => { sfx.penalty(); nextTurn(); }} variant="secondary" size="md" style={styles.refuse} />
           </View>
         </>
       ) : (

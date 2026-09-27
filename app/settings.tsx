@@ -29,6 +29,19 @@ export default function SettingsScreen() {
 
           <View style={[styles.row, Platform.OS === 'web' && (GlassStyle as any)]}>
             <View style={styles.rowInfo}>
+              <Text style={styles.rowLabel}>Geluid</Text>
+              <Text style={styles.rowDesc}>Aftelling, kaarten, de bom en de uitslag</Text>
+            </View>
+            <Switch
+              value={settings.soundEnabled}
+              onValueChange={settings.setSoundEnabled}
+              trackColor={{ false: Colors.glass, true: Colors.primary }}
+              thumbColor={Colors.text}
+            />
+          </View>
+
+          <View style={[styles.row, Platform.OS === 'web' && (GlassStyle as any)]}>
+            <View style={styles.rowInfo}>
               <Text style={styles.rowLabel}>Haptics</Text>
               <Text style={styles.rowDesc}>Subtiele trilling bij aanrakingen</Text>
             </View>

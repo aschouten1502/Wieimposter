@@ -8,6 +8,7 @@ import { IconEye, IconMask } from '@/components/icons';
 import { Colors, Fonts, Spacing, FontSize, BorderRadius, GlassStyle } from '@/constants/theme';
 import { useGameStore } from '@/store/gameStore';
 import { fitFontSize } from '@/utils/helpers';
+import { sfx } from '@/utils/sound';
 import { useHaptics } from '@/hooks/useHaptics';
 import { PLAYER_COLORS } from '@/constants/config';
 
@@ -45,10 +46,13 @@ export default function RevealScreen() {
 
   const handleReveal = () => {
     setRevealed(true);
+    sfx.flip();
     if (isImposter) {
       haptics.error();
+      setTimeout(() => sfx.revealImposter(), 260);
     } else {
       haptics.success();
+      setTimeout(() => sfx.revealCivilian(), 260);
     }
     Animated.spring(flipAnim, {
       toValue: 1,
